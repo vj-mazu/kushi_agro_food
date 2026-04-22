@@ -671,7 +671,7 @@ export default function Home() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-white max-w-4xl w-full aspect-[4/3] relative"
+              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-white max-w-2xl w-full aspect-[3/4] relative mx-auto"
             >
               <img 
                 src="/karnataka-award-2025.png" 
