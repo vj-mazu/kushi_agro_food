@@ -514,6 +514,20 @@ export default function Home() {
                       alt={product.name}
                       className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
+                    {product.badge && (
+                      <div className="absolute top-4 left-4 z-20">
+                        <motion.div 
+                          initial={{ x: -10, opacity: 0 }}
+                          whileInView={{ x: 0, opacity: 1 }}
+                          className={`rounded-lg ${
+                            product.badge === 'Top Seller' ? 'bg-[#D7B06B]' : 'bg-[#E23744]'
+                          } px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white shadow-xl flex items-center gap-2`}
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          {product.badge}
+                        </motion.div>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
                        <button
                         type="button"
@@ -530,10 +544,13 @@ export default function Home() {
                 </div>
                 <div className="space-y-4 p-8">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="rounded-full bg-[#F4E6C8] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]">
-                      {product.views} views
-                    </span>
-                    <span className="text-sm font-medium text-[#8C6A3A]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#8C6A3A] opacity-50" />
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]/70">
+                        {product.views} views
+                      </span>
+                    </div>
+                    <span className="text-xs font-bold text-[#8C6A3A] bg-[#F4E6C8]/40 px-3 py-1 rounded-full">
                       {product.pack}
                     </span>
                   </div>
@@ -547,14 +564,22 @@ export default function Home() {
                       style={{ fontFamily: "Instrument Serif, serif" }}
                     >
                       {product.name}
+                      {product.variant && (
+                        <span className="block text-xl opacity-80 mt-1 font-normal italic">
+                          {product.variant}
+                        </span>
+                      )}
                     </h4>
+                    <p className="mt-4 text-sm text-[#5F5548] leading-relaxed font-light">
+                      {product.tagline}
+                    </p>
                   </div>
   
-                  <div className="pt-4 border-t border-[#E3D2B5]/30">
+                  <div className="pt-6 border-t border-[#E3D2B5]/30">
                     <button
                       type="button"
                       onClick={() => addToCart(product)}
-                      className="w-full rounded-full bg-[#1D160E] px-5 py-4 text-sm font-medium text-white transition hover:bg-[#3A2E21] hover:shadow-lg"
+                      className="w-full rounded-full bg-[#1D160E] px-5 py-4 text-sm font-semibold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_10px_20px_rgba(29,22,14,0.2)] active:scale-95"
                     >
                       Order via WhatsApp
                     </button>
