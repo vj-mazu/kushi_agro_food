@@ -646,6 +646,42 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <section className="relative z-10 bg-white px-6 py-28 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col items-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="max-w-3xl"
+            >
+              <p className="text-sm uppercase tracking-[0.4em] text-[#8C6A3A] font-bold">
+                Excellence & Recognition
+              </p>
+              <h3
+                className="mt-6 text-5xl text-[#1D160E] md:text-7xl leading-tight"
+                style={{ fontFamily: "Instrument Serif, serif" }}
+              >
+                Awarded for Outstanding <br/> Contribution at Karnataka Invest 2025
+              </h3>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-[#FBF8F2] p-8 md:p-12"
+            >
+              <img 
+                src="/karnataka-award-2025.png" 
+                alt="Karnataka Invest 2025 Award" 
+                className="max-w-full h-auto rounded-2xl"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       <section id="testimonials" className="relative z-10 bg-white px-6 py-40 lg:px-8">
         <div className="mx-auto max-w-7xl">
