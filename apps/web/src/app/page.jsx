@@ -270,7 +270,7 @@ export default function Home() {
     : WHATSAPP_BASE;
 
   return (
-    <div className="relative min-h-screen bg-[#F6F1E8] text-[#1D160E]">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#F6F1E8] text-[#1D160E]">
       <AnimatePresence>
         {isLoading && <Preloader />}
       </AnimatePresence>
