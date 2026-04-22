@@ -134,16 +134,20 @@ function PrivacyModal({ isOpen, onClose }) {
 }
 
 function createWhatsAppUrl(items) {
-  const header = "Hello Kushi Agro Foods, I want to order these products:";
+  const title = "*OFFICIAL ORDER INQUIRY*";
+  const brand = "*Kushi Agro Foods*";
+  const greeting = "Hello, I would like to inquire about the following products:";
+  
   const productLines =
     items.length > 0
-      ? items.map((item) => `- ${item.name} x${item.quantity} (${item.pack})`).join("\n")
-      : "- Please share your rice catalog and current stock.";
-  const footer = "Please share price, stock, and delivery details.";
+      ? items.map((item) => `• *${item.name}*\n  Qty: ${item.quantity} | Pack: ${item.pack}`).join("\n\n")
+      : "• Please share your complete rice catalog and current stock availability.";
+      
+  const footer = "Please share the price, stock status, and delivery details.\n\nThank you!";
 
-  return `${WHATSAPP_BASE}?text=${encodeURIComponent(
-    `${header}\n${productLines}\n${footer}`,
-  )}`;
+  const fullMessage = `${title}\n${brand}\n\n${greeting}\n\n${productLines}\n\n${footer}`;
+
+  return `${WHATSAPP_BASE}?text=${encodeURIComponent(fullMessage)}`;
 }
 
 export default function Home() {
