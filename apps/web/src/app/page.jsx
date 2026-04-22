@@ -671,12 +671,12 @@ export default function Home() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-[#FBF8F2] p-8 md:p-12"
+              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-white max-w-4xl w-full aspect-[4/3] relative"
             >
               <img 
                 src="/karnataka-award-2025.png" 
                 alt="Karnataka Invest 2025 Award" 
-                className="max-w-full h-auto rounded-2xl"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </motion.div>
           </div>
