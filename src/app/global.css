@@ -12,6 +12,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-[#F6F1E8] antialiased;
 }

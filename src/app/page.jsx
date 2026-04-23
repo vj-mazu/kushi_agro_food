@@ -37,7 +37,7 @@ function Preloader() {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.8, delay: 2.2 }}
+      transition={{ duration: 0.6, delay: 1.5 }}
       onAnimationComplete={() => {
         document.body.style.overflow = "auto";
       }}
@@ -58,15 +58,15 @@ function Preloader() {
 
       <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
+          initial={{ opacity: 0, y: 16, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/95 p-3 shadow-[0_25px_70px_rgba(0,0,0,0.28)]"
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-8 overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/95 p-3.5 shadow-[0_30px_90px_rgba(0,0,0,0.35)]"
         >
           <img
             src="/logo.png"
             alt="Kushi Agro Foods logo"
-            className="h-20 w-auto md:h-28"
+            className="h-20 w-auto md:h-32"
           />
         </motion.div>
         <motion.p
@@ -190,7 +190,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 1200); // Speed up preloader significantly (from 3.5s to 1.2s)
+    }, 800); // Speed up preloader significantly (from 1.2s to 0.8s internal state)
     return () => {
       document.body.style.overflow = "auto";
       clearTimeout(timer);
@@ -332,6 +332,8 @@ export default function Home() {
           autoPlay
           muted
           playsInline
+          loop
+          poster="/premium-rice.png"
           className="h-full w-full object-cover"
           style={{ opacity: videoOpacity }}
           onError={() => setVideoOpacity(1)}
@@ -344,7 +346,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+      <nav className="fixed top-0 left-0 right-0 z-50 mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8 bg-white/5 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-4">
           <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-white/95 p-1.5 shadow-[0_18px_45px_rgba(0,0,0,0.2)] backdrop-blur-sm">
             <img
@@ -484,6 +486,7 @@ export default function Home() {
               <img 
                 src="/premium-rice.png" 
                 alt="Premium White Rice" 
+                loading="lazy"
                 className="w-full h-[600px] object-cover"
               />
             </motion.div>
@@ -584,6 +587,7 @@ export default function Home() {
                     <img
                       src={product.coverImage}
                       alt={product.name}
+                      loading="lazy"
                       className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                     {product.badge && (
@@ -649,7 +653,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="mt-auto pt-6 border-t border-[#E3D2B5]/30">
+                <div className="mt-auto px-8 pb-8 pt-6 border-t border-[#E3D2B5]/30">
                     <button
                       type="button"
                       onClick={() => addToCart(product)}
@@ -718,7 +722,7 @@ export default function Home() {
               </div>
               <div className="mt-12 flex flex-wrap gap-8">
                 <div className="flex flex-col">
-                  <span className="text-4xl font-serif text-[#1D160E]">35+</span>
+                  <span className="text-4xl font-serif text-[#1D160E]">50+</span>
                   <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-1">Years Experience</span>
                 </div>
                 <div className="h-12 w-px bg-[#E3D2B5]" />
@@ -740,6 +744,7 @@ export default function Home() {
                 muted 
                 loop 
                 playsInline 
+                poster="/premium-rice.png"
                 className="absolute inset-0 w-full h-full object-cover"
               >
                 <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbed9a9a97e828452c1b96092af6e74723000&profile_id=165&oauth2_token_id=57447761" type="video/mp4" />
@@ -825,7 +830,7 @@ export default function Home() {
                   y: -10,
                   transition: { duration: 0.4 }
                 }}
-                className="rounded-[4rem] border border-[#E3D2B5] bg-[#FBF8F2] p-12 shadow-xl hover:shadow-[0_40px_80px_rgba(140,106,58,0.12)] transition-all cursor-default"
+                className="rounded-[4rem] border border-[#E3D2B5] bg-[#FBF8F2] p-12 shadow-[0_20px_60px_rgba(140,106,58,0.04)] hover:shadow-[0_40px_80px_rgba(140,106,58,0.12)] transition-all duration-500 cursor-default"
                 style={{ perspective: "1500px" }}
               >
                 <div className="flex text-[#D7B06B] mb-8">
@@ -988,6 +993,7 @@ export default function Home() {
                             <img
                               src={image}
                               alt={`${selectedProduct.name} view ${index + 1}`}
+                              loading="lazy"
                               className="max-h-full max-w-full object-contain"
                             />
                           </div>
