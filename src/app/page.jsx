@@ -174,6 +174,14 @@ export default function Home() {
   const [products, setProducts] = useState(() => buildCatalogProducts(defaultCatalog));
   const videoRef = useRef(null);
   const productCarouselRef = useRef(null);
+
+  const handleNavClick = (e, id) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   const detailCarouselRef = useRef(null);
 
   useEffect(() => {
@@ -359,13 +367,13 @@ export default function Home() {
         </div>
 
         <div className="hidden items-center gap-10 md:flex">
-          <a href="#home" className="text-xs uppercase tracking-widest font-bold text-white hover:text-[#D7B06B]">
+          <a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="text-xs uppercase tracking-widest font-bold text-white hover:text-[#D7B06B]">
             Home
           </a>
-          <a href="#products" className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
+          <a href="#products" onClick={(e) => handleNavClick(e, 'products')} className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
             Products
           </a>
-          <a href="#about" className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
+          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
             About
           </a>
           {/* Admin link hidden from public as requested */}
@@ -414,6 +422,7 @@ export default function Home() {
             <div className="flex flex-col gap-6 sm:flex-row sm:justify-center">
               <a
                 href="#products"
+                onClick={(e) => handleNavClick(e, 'products')}
                 className="group relative flex items-center justify-center overflow-hidden rounded-full bg-[#1D160E] px-14 py-6 text-sm font-bold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
               >
                 <span className="relative z-10">Browse Our Products</span>
@@ -1196,10 +1205,10 @@ export default function Home() {
               <div className="space-y-6">
                 <p className="text-xs uppercase tracking-widest text-[#D7B06B]">Quick Links</p>
                 <ul className="space-y-4 text-sm text-white/50">
-                  <li><a href="#home" className="hover:text-white transition-colors">Home</a></li>
-                  <li><a href="#products" className="hover:text-white transition-colors">Products</a></li>
-                  <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
-                  <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
+                  <li><a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="hover:text-white transition-colors">Home</a></li>
+                  <li><a href="#products" onClick={(e) => handleNavClick(e, 'products')} className="hover:text-white transition-colors">Products</a></li>
+                  <li><a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="hover:text-white transition-colors">About Us</a></li>
+                  <li><a href="#contact" onClick={(e) => handleNavClick(e, 'contact')} className="hover:text-white transition-colors">Contact</a></li>
                 </ul>
               </div>
               <div className="space-y-6">
