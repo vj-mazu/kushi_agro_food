@@ -167,7 +167,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 3500); // Wait for preloader animation to finish
+    }, 1200); // Speed up preloader significantly (from 3.5s to 1.2s)
     return () => {
       document.body.style.overflow = "auto";
       clearTimeout(timer);
@@ -197,10 +197,15 @@ export default function Home() {
       const currentTime = video.currentTime;
       const duration = video.duration;
 
+      if (!duration || isNaN(duration)) {
+        setVideoOpacity(1);
+        return;
+      }
+
       if (currentTime < fadeDuration) {
         setVideoOpacity(currentTime / fadeDuration);
       } else if (currentTime > duration - fadeDuration) {
-        setVideoOpacity((duration - currentTime) / fadeDuration);
+        setVideoOpacity(Math.max(0, (duration - currentTime) / fadeDuration));
       } else {
         setVideoOpacity(1);
       }
