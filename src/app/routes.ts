@@ -39,7 +39,7 @@ function generateRoutesFromGlob(): RouteConfigEntry[] {
   return routes;
 }
 
-const notFound = route('*?', './__create/not-found.tsx');
+const notFound = route('*', './__create/not-found.tsx');
 const routes = [...generateRoutesFromGlob(), notFound];
 
 export default routes;
