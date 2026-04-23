@@ -1687,28 +1687,7 @@ export function loadFontsFromTailwindSource(): PluginOption {
           return code;
         }
       },
-      async handleHotUpdate({ file, server, modules }) {
-        const fontsBefore = new Set(collectedFonts);
-        await collectFonts();
-        const fontsAfter = new Set(collectedFonts);
-        if (
-          fontsBefore.size === fontsAfter.size &&
-          [...fontsBefore].every((f) => fontsAfter.has(f))
-        ) {
-          return;
-        }
-        const virtualModuleId = 'virtual:load-fonts.jsx';
-        const mod = server.moduleGraph.getModuleById(virtualModuleId);
-        if (!mod) {
-          return;
-        }
-        server.reloadModule(mod);
-        server.ws.send({
-          type: 'custom',
-          event: 'update-font-links',
-          data: [...fontsAfter].map((font) => getFontURL(font)),
-        });
-      },
+
     },
   ];
 }
