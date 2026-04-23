@@ -20,8 +20,8 @@ export default defineConfig({
     target: 'esnext',
   },
   ssr: {
-    external: ['three', 'pdfjs-dist', 'html-to-image', 'argon2'],
-    noExternal: ['@hono/auth-js', 'react-router-hono-server'],
+    external: ['three', 'pdfjs-dist', 'html-to-image', 'argon2', 'ws'],
+    noExternal: true,
   },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
