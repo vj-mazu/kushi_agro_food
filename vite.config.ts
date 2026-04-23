@@ -19,6 +19,10 @@ export default defineConfig({
   build: {
     target: 'esnext',
   },
+  ssr: {
+    external: ['three', 'pdfjs-dist', 'html-to-image', 'argon2'],
+    noExternal: ['@hono/auth-js', 'react-router-hono-server'],
+  },
   optimizeDeps: {
     // Explicitly include fast-glob, since it gets dynamically imported and we
     // don't want that to cause a re-bundle.
