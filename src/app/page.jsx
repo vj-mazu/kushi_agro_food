@@ -173,6 +173,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState(() => buildCatalogProducts(defaultCatalog));
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const videoRef = useRef(null);
   const productCarouselRef = useRef(null);
 
@@ -387,6 +388,25 @@ export default function Home() {
           </div>
         </div>
 
+        <div className="flex items-center gap-4 md:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className={`p-2 transition-colors ${
+              isScrolled ? "text-[#1D160E]" : "text-white"
+            }`}
+          >
+            {isMobileMenuOpen ? (
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            )}
+          </button>
+        </div>
+
         <div className="hidden items-center gap-10 md:flex">
           <a href="#home" onClick={(e) => handleNavClick(e, 'home')} className={`text-xs uppercase tracking-widest font-bold transition-colors ${
             isScrolled ? "text-[#1D160E] hover:text-[#8C6A3A]" : "text-white hover:text-[#D7B06B]"
@@ -403,7 +423,6 @@ export default function Home() {
           }`}>
             About
           </a>
-          {/* Admin link hidden from public as requested */}
           <a
             href={WHATSAPP_BASE}
             target="_blank"
@@ -426,6 +445,67 @@ export default function Home() {
           </a>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[45] bg-[#FFFDF9] pt-32 px-10 md:hidden"
+          >
+            <div className="flex flex-col gap-10">
+              <a 
+                href="#home" 
+                onClick={(e) => {
+                  handleNavClick(e, 'home');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="text-4xl font-serif text-[#1D160E]"
+              >
+                Home
+              </a>
+              <a 
+                href="#products" 
+                onClick={(e) => {
+                  handleNavClick(e, 'products');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="text-4xl font-serif text-[#1D160E]"
+              >
+                Products
+              </a>
+              <a 
+                href="#about" 
+                onClick={(e) => {
+                  handleNavClick(e, 'about');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="text-4xl font-serif text-[#1D160E]"
+              >
+                About Us
+              </a>
+              <div className="h-px w-full bg-[#E3D2B5]" />
+              <div className="flex flex-col gap-4">
+                <a
+                  href={WHATSAPP_BASE}
+                  className="w-full rounded-full bg-[#1D160E] py-5 text-center text-white font-bold"
+                >
+                  WhatsApp Us
+                </a>
+                <a
+                  href={`tel:${PHONE_RAW}`}
+                  className="w-full rounded-full border border-[#1D160E] py-5 text-center text-[#1D160E] font-bold"
+                >
+                  Call To Order
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <section
         id="home"
@@ -1278,10 +1358,16 @@ export default function Home() {
 
               <div className="space-y-6">
                 <p className="text-xs uppercase tracking-widest text-[#D7B06B]">Factory</p>
-                <p className="text-sm text-white/50 leading-relaxed">
-                  Industrial Area, Raichur-Hyderabad Rd,<br/>
-                  Raichur, Karnataka 584102
-                </p>
+                <div className="flex gap-4">
+                  <svg className="w-5 h-5 text-[#D7B06B] shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <p className="text-sm text-white/50 leading-relaxed">
+                    Industrial Area, Raichur-Hyderabad Rd,<br/>
+                    Raichur, Karnataka 584102
+                  </p>
+                </div>
               </div>
             </div>
           </div>
