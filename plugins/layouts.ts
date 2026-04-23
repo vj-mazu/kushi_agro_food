@@ -32,7 +32,7 @@ export function layoutWrapperPlugin(userOpts: HierarchicalLayoutOptions = {}): P
   const opts: Required<HierarchicalLayoutOptions> = {
     pagePattern: userOpts.pagePattern ?? DEFAULT_PAGE_PATTERN,
     layoutFiles: userOpts.layoutFiles ?? DEFAULT_LAYOUT_FILES,
-    srcRoots: userOpts.srcRoots ?? [path.join(__dirname, '../src')],
+    srcRoots: userOpts.srcRoots ?? [path.resolve('./src')],
   };
 
   let root = '';
@@ -70,15 +70,15 @@ export function layoutWrapperPlugin(userOpts: HierarchicalLayoutOptions = {}): P
     while (true) {
       for (const name of o.layoutFiles) {
         const candidate = path.join(dir, name);
-        // this ensures we don't try to include layouts that don't export anything
         if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
           const hasExport = fs.readFileSync(candidate, 'utf-8').includes('export');
           layouts.unshift({ absFile: candidate, hasExport });
         }
       }
-      if (stopDirs.includes(dir)) break;
+      // Stop if we hit any of the configured roots OR the Vite project root
+      if (stopDirs.includes(dir) || dir === root) break;
       const parent = path.dirname(dir);
-      if (parent === dir) break; // reached filesystem root
+      if (parent === dir) break;
       dir = parent;
     }
     return layouts;
