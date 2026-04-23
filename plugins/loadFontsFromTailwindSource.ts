@@ -1647,31 +1647,10 @@ export function loadFontsFromTailwindSource(): PluginOption {
   // Store collected font names
   const collectedFonts = new Set<string>();
 
-  // Reset the collected fonts
-  const reset = () => {
-    collectedFonts.clear();
-  };
-  const collectFonts = async () => {
-    const files = await fg('src/**/*.{js,ts,jsx,tsx}');
-    const allFonts = await Promise.all(
-      files.map(async (file) => {
-        const code = await fs.promises.readFile(file, 'utf-8');
-        return extractFonts(code);
-      })
-    );
-    for (const font of allFonts.flat()) {
-      collectedFonts.add(font);
-    }
-  };
-
   return [
     {
       name: 'load-fonts-from-tailwind-source',
       enforce: 'pre',
-      async buildStart() {
-        reset();
-        await collectFonts();
-      },
       transform(code, id) {
         if (!/\.([cm]?[jt]sx)$/.test(id)) {
           return null;
