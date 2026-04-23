@@ -15,7 +15,7 @@ const GOOGLE_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Kushi+A
 
 
 const stats = [
-  { label: "Years of Heritage", value: "35", suffix: "+" },
+  { label: "Years of Heritage", value: "50", suffix: "+" },
   { label: "Happy Customers", value: "10000", suffix: "+" },
   { label: "Premium Varieties", value: "25", suffix: "+" },
   { label: "Purity Guarantee", value: "100", suffix: "%" },
@@ -47,23 +47,35 @@ function Preloader() {
         initial={{ scaleX: 0, opacity: 0.2 }}
         animate={{ scaleX: 1, opacity: 1 }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute left-0 top-[24%] h-px w-full origin-left bg-gradient-to-r from-transparent via-[#D7B06B] to-transparent"
+        className="absolute left-0 top-[15%] h-px w-full origin-left bg-gradient-to-r from-transparent via-[#D7B06B] to-transparent"
       />
       <motion.div
         initial={{ scaleX: 0, opacity: 0.2 }}
         animate={{ scaleX: 1, opacity: 1 }}
         transition={{ duration: 1.2, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute bottom-[24%] left-0 h-px w-full origin-right bg-gradient-to-r from-transparent via-[#D7B06B] to-transparent"
+        className="absolute bottom-[15%] left-0 h-px w-full origin-right bg-gradient-to-r from-transparent via-[#D7B06B] to-transparent"
       />
 
       <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-white/95 p-3 shadow-[0_25px_70px_rgba(0,0,0,0.28)]"
+        >
+          <img
+            src="/logo.png"
+            alt="Kushi Agro Foods logo"
+            className="h-20 w-auto md:h-28"
+          />
+        </motion.div>
         <motion.p
           initial={{ opacity: 0, y: 18, letterSpacing: "0.55em" }}
           animate={{ opacity: 1, y: 0, letterSpacing: "0.32em" }}
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
           className="mb-5 text-[11px] uppercase tracking-[0.32em] text-[#D7B06B]"
         >
-          Premium Rice Since 1987
+          Premium Rice Since 1975
         </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 28 }}
@@ -154,12 +166,15 @@ export default function Home() {
   const [videoOpacity, setVideoOpacity] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [productScrollIndex, setProductScrollIndex] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState(() => buildCatalogProducts(defaultCatalog));
   const videoRef = useRef(null);
+  const productCarouselRef = useRef(null);
+  const detailCarouselRef = useRef(null);
 
   useEffect(() => {
     // Prevent scroll during preloader
@@ -231,6 +246,22 @@ export default function Home() {
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
+
+  const scrollToProduct = (index) => {
+    const container = productCarouselRef.current;
+    const target = container?.children?.[index];
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    setProductScrollIndex(index);
+  };
+
+  const scrollToProductImage = (index) => {
+    const container = detailCarouselRef.current;
+    const target = container?.children?.[index];
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    setActiveImageIndex(index);
+  };
 
   const addToCart = (product) => {
     setCartItems((currentItems) => {
@@ -306,14 +337,25 @@ export default function Home() {
       </div>
 
       <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
-        <div className="flex items-center gap-2">
-          <h1
-            className="text-4xl font-bold tracking-tight text-white transition-colors md:text-6xl"
-            style={{ fontFamily: "Instrument Serif, serif" }}
-          >
-            Kushi Agro Foods
-          </h1>
-
+        <div className="flex items-center gap-4">
+          <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-white/95 p-1.5 shadow-[0_18px_45px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+            <img
+              src="/logo.png"
+              alt="Kushi Agro Foods logo"
+              className="h-12 w-auto md:h-16"
+            />
+          </div>
+          <div className="hidden sm:block">
+            <h1
+              className="text-4xl font-bold tracking-tight text-white transition-colors md:text-6xl"
+              style={{ fontFamily: "Instrument Serif, serif" }}
+            >
+              Kushi Agro Foods
+            </h1>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.34em] text-white/70 md:text-xs">
+              Premium Rice Since 1975
+            </p>
+          </div>
         </div>
 
         <div className="hidden items-center gap-10 md:flex">
@@ -491,9 +533,24 @@ export default function Home() {
                 Curated Selection of <br/> Premium Rice Brands
               </h3>
             </div>
+            <div className="flex items-center gap-4 md:hidden">
+              <div className="h-px w-8 bg-[#8C6A3A]/20" />
+              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#8C6A3A]">
+                Swipe Through Brands
+              </p>
+            </div>
           </motion.div>
 
-          <div className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:overflow-visible">
+          <div 
+            ref={productCarouselRef}
+            className="flex gap-6 overflow-x-auto pb-12 snap-x snap-mandatory no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:overflow-visible"
+            onScroll={(e) => {
+              const scrollLeft = e.currentTarget.scrollLeft;
+              const width = e.currentTarget.clientWidth;
+              const index = Math.round(scrollLeft / (width * 0.9)); // 90% is the card width on mobile
+              if (index !== productScrollIndex) setProductScrollIndex(index);
+            }}
+          >
 
             {products.map((product, idx) => (
               <motion.article
@@ -509,7 +566,7 @@ export default function Home() {
                   scale: 1.02,
                   transition: { duration: 0.3 }
                 }}
-                className="min-w-[90%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[2.5rem] border border-[#E3D2B5] bg-[#FFFDF9] shadow-[0_18px_50px_rgba(78,58,31,0.06)] transition-all hover:shadow-2xl group cursor-pointer"
+                className="min-w-[90%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[2.5rem] border border-[#E3D2B5] bg-[#FFFDF9] shadow-[0_18px_50px_rgba(78,58,31,0.06)] transition-all hover:shadow-2xl group cursor-pointer flex flex-col h-full"
                 style={{ perspective: "1000px" }}
               >
 
@@ -548,8 +605,9 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-4 p-8">
-                  <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col flex-1 p-8">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#8C6A3A] opacity-50" />
                       <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]/70">
@@ -580,8 +638,9 @@ export default function Home() {
                       {product.tagline}
                     </p>
                   </div>
-  
-                  <div className="pt-6 border-t border-[#E3D2B5]/30">
+                </div>
+
+                <div className="mt-auto pt-6 border-t border-[#E3D2B5]/30">
                     <button
                       type="button"
                       onClick={() => addToCart(product)}
@@ -593,6 +652,25 @@ export default function Home() {
                 </div>
               </motion.article>
             ))}
+          </div>
+
+          <div className="mt-2 flex flex-col items-center gap-3 md:hidden">
+            <div className="flex max-w-full items-center gap-2 overflow-x-auto px-2 pb-1 no-scrollbar">
+              {products.map((product, idx) => (
+                <button
+                  key={product.id}
+                  type="button"
+                  onClick={() => scrollToProduct(idx)}
+                  aria-label={`Go to ${product.name}`}
+                  className={`h-2.5 shrink-0 rounded-full transition-all duration-300 ${
+                    productScrollIndex === idx ? "w-10 bg-[#1D160E]" : "w-2.5 bg-[#D8C4A1]"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.26em] text-[#8C6A3A]">
+              {productScrollIndex + 1} of {products.length}
+            </p>
           </div>
 
 
@@ -615,11 +693,11 @@ export default function Home() {
                 className="mt-8 text-6xl text-[#1D160E] md:text-8xl leading-[1.05]"
                 style={{ fontFamily: "Instrument Serif, serif" }}
               >
-                Legacy Built on <br/> Trust Since 1987
+                Legacy Built on <br/> Trust Since 1975
               </h3>
               <div className="mt-12 space-y-6 text-lg leading-[1.8] text-[#5F5548]">
                 <p>
-                  For over three and a half decades, Kushi Agro Foods has been the cornerstone 
+                  For over five decades, Kushi Agro Foods has been the cornerstone 
                   of premium rice supply in Raichur. Our journey began with a simple vision: 
                   to bring the finest grains from the fertile fields directly to your table.
                 </p>
@@ -884,6 +962,7 @@ export default function Home() {
                   <div className="w-full lg:w-1/2">
                     <div className="relative">
                       <div 
+                        ref={detailCarouselRef}
                         className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar"
                         onScroll={(e) => {
                           const scrollLeft = e.currentTarget.scrollLeft;
@@ -905,33 +984,37 @@ export default function Home() {
                           </div>
                         ))}
                       </div>
-                      <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none lg:hidden"
-                      >
-                        <div className="bg-black/20 backdrop-blur-md rounded-full p-3">
-                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
-                      </motion.div>
+                      <div className="absolute bottom-10 left-0 right-0 hidden items-center justify-center gap-2 lg:flex">
+                        {selectedProduct.images.map((_, idx) => (
+                          <div 
+                            key={idx}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              activeImageIndex === idx ? "w-6 bg-[#1D160E]" : "w-1.5 bg-[#D9C8A7]"
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <p className="text-center text-xs text-[#8C6A3A] uppercase tracking-widest mt-2 font-bold animate-pulse lg:hidden">
-                      Swipe to explore more details
-                    </p>
-                    <div className="mt-4 flex items-center justify-center gap-2">
-                      {selectedProduct.images.map((_, idx) => (
-                        <div 
-                          key={idx}
-                          className={`h-1.5 rounded-full transition-all duration-300 ${
-                            activeImageIndex === idx ? "w-6 bg-[#1D160E]" : "w-1.5 bg-[#D9C8A7]"
-                          }`}
-                        />
-                      ))}
+                    <div className="mt-3 flex flex-col items-center gap-3 lg:hidden">
+                      <p className="text-center text-[11px] text-[#8C6A3A] uppercase tracking-[0.28em] font-bold">
+                        Swipe to explore more details
+                      </p>
+                      <div className="flex max-w-full items-center gap-2 overflow-x-auto px-2 pb-1 no-scrollbar">
+                        {selectedProduct.images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => scrollToProductImage(idx)}
+                            aria-label={`Go to image ${idx + 1}`}
+                            className={`shrink-0 rounded-full transition-all duration-300 ${
+                              activeImageIndex === idx
+                                ? "h-2.5 w-10 bg-[#1D160E]"
+                                : "h-2.5 w-2.5 bg-[#D9C8A7]"
+                            }`}
+                          />
+                        ))}
+                      </div>
                     </div>
-
                   </div>
                   
                   <div className="w-full lg:w-1/2 space-y-8">
@@ -976,7 +1059,6 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-
       <button
         type="button"
         onClick={() => setIsCartOpen(true)}
@@ -1100,7 +1182,7 @@ export default function Home() {
               </h4>
               <p className="mt-6 max-w-md text-base leading-8 text-white/50">
                 Premium quality rice supply from the heart of Raichur. 
-                Dedicated to purity, heritage, and customer satisfaction since 1987.
+                Dedicated to purity, heritage, and customer satisfaction since 1975.
               </p>
               <div className="mt-10 flex gap-6">
                 {/* Social links placeholder */}
@@ -1128,7 +1210,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-6">
-                <p className="text-xs uppercase tracking-widest text-[#D7B06B]">Office</p>
+                <p className="text-xs uppercase tracking-widest text-[#D7B06B]">Factory</p>
                 <p className="text-sm text-white/50 leading-relaxed">
                   Industrial Area, Raichur-Hyderabad Rd,<br/>
                   Raichur, Karnataka 584102
@@ -1141,9 +1223,14 @@ export default function Home() {
             <p className="text-xs text-white/30 uppercase tracking-[0.2em]">
               &copy; 2026 Kushi Agro Foods. All rights reserved.
             </p>
-            <p className="text-xs text-white/30 uppercase tracking-[0.2em]">
-              Designed for Excellence
-            </p>
+            <div className="flex flex-col items-center md:items-end gap-1 text-center md:text-right">
+              <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">
+                Designed & Developed by <span className="text-white/50 font-bold">Manjunath</span>
+              </p>
+              <p className="text-[10px] text-white/30 uppercase tracking-[0.2em]">
+                Ph: <a href="tel:+919448986953" className="hover:text-[#D7B06B] transition-colors">9448986953</a>
+              </p>
+            </div>
           </div>
         </div>
       </footer>
