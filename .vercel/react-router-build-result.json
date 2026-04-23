@@ -1,0 +1,226 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "__create/social-dev-shim/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "account/signin/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "account/signup/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "admin/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "onboarding/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "privacy/page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "__create/not-found": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "src/app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "__create/social-dev-shim/page": {
+        "id": "__create/social-dev-shim/page",
+        "parentId": "root",
+        "file": "src/app/__create/social-dev-shim/page.jsx",
+        "path": "__create/social-dev-shim",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "account/signin/page": {
+        "id": "account/signin/page",
+        "parentId": "root",
+        "file": "src/app/account/signin/page.jsx",
+        "path": "account/signin",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "account/signup/page": {
+        "id": "account/signup/page",
+        "parentId": "root",
+        "file": "src/app/account/signup/page.jsx",
+        "path": "account/signup",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "admin/page": {
+        "id": "admin/page",
+        "parentId": "root",
+        "file": "src/app/admin/page.jsx",
+        "path": "admin",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "onboarding/page": {
+        "id": "onboarding/page",
+        "parentId": "root",
+        "file": "src/app/onboarding/page.jsx",
+        "path": "onboarding",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "page": {
+        "id": "page",
+        "parentId": "root",
+        "file": "src/app/page.jsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "privacy/page": {
+        "id": "privacy/page",
+        "parentId": "root",
+        "file": "src/app/privacy/page.jsx",
+        "path": "privacy",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "__create/not-found": {
+        "id": "__create/not-found",
+        "parentId": "root",
+        "file": "src/app/__create/not-found.tsx",
+        "path": "*?",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "C:/Users/maju/Downloads/anything/anything/src/app",
+    "basename": "/",
+    "buildDirectory": "C:/Users/maju/Downloads/anything/anything/build",
+    "future": {
+      "unstable_optimizeDeps": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_trailingSlashAwareDataRequests": false,
+      "unstable_previewServerPrerendering": false,
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "__create/social-dev-shim/page": {
+        "id": "__create/social-dev-shim/page",
+        "parentId": "root",
+        "file": "./__create/social-dev-shim/page.jsx",
+        "path": "__create/social-dev-shim"
+      },
+      "account/signin/page": {
+        "id": "account/signin/page",
+        "parentId": "root",
+        "file": "./account/signin/page.jsx",
+        "path": "account/signin"
+      },
+      "account/signup/page": {
+        "id": "account/signup/page",
+        "parentId": "root",
+        "file": "./account/signup/page.jsx",
+        "path": "account/signup"
+      },
+      "admin/page": {
+        "id": "admin/page",
+        "parentId": "root",
+        "file": "./admin/page.jsx",
+        "path": "admin"
+      },
+      "onboarding/page": {
+        "id": "onboarding/page",
+        "parentId": "root",
+        "file": "./onboarding/page.jsx",
+        "path": "onboarding"
+      },
+      "page": {
+        "id": "page",
+        "parentId": "root",
+        "file": "./page.jsx",
+        "index": true
+      },
+      "privacy/page": {
+        "id": "privacy/page",
+        "parentId": "root",
+        "file": "./privacy/page.jsx",
+        "path": "privacy"
+      },
+      "__create/not-found": {
+        "id": "__create/not-found",
+        "parentId": "root",
+        "file": "./__create/not-found.tsx",
+        "path": "*?"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "allowedActionOrigins": false,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "./__create/social-dev-shim/page.jsx",
+            "path": "__create/social-dev-shim"
+          },
+          {
+            "file": "./account/signin/page.jsx",
+            "path": "account/signin"
+          },
+          {
+            "file": "./account/signup/page.jsx",
+            "path": "account/signup"
+          },
+          {
+            "file": "./admin/page.jsx",
+            "path": "admin"
+          },
+          {
+            "file": "./onboarding/page.jsx",
+            "path": "onboarding"
+          },
+          {
+            "file": "./page.jsx",
+            "index": true
+          },
+          {
+            "file": "./privacy/page.jsx",
+            "path": "privacy"
+          },
+          {
+            "file": "./__create/not-found.tsx",
+            "path": "*?"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}

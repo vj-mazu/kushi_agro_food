@@ -1,3 +1,4 @@
+import { vercelPreset } from "@vercel/react-router/vite";
 import type { Config } from "@react-router/dev/config";
 
 export default {
@@ -5,7 +6,8 @@ export default {
   appDirectory: "src/app",
   // Use the default build output directory
   buildDirectory: "build",
-  // Optimization: Tell React Router to ignore the mobile directory explicitly
-  watchSignals: false,
-  // Optimization: Disable expensive source maps in production to speed up tracing
+  // Enable SSR for Vercel serverless functions
+  ssr: true,
+  // Use Vercel preset for proper serverless deployment
+  presets: [vercelPreset()],
 } satisfies Config;
