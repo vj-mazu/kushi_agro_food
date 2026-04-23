@@ -37,7 +37,7 @@ function Preloader() {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.6, delay: 1.5 }}
+      transition={{ duration: 1.2, delay: 5 }}
       onAnimationComplete={() => {
         document.body.style.overflow = "auto";
       }}
@@ -172,8 +172,17 @@ export default function Home() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState(() => buildCatalogProducts(defaultCatalog));
+  const [isScrolled, setIsScrolled] = useState(false);
   const videoRef = useRef(null);
   const productCarouselRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleNavClick = (e, id) => {
     e.preventDefault();
@@ -190,7 +199,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 800); // Speed up preloader significantly (from 1.2s to 0.8s internal state)
+    }, 5000); // 5 second preloader as requested
     return () => {
       document.body.style.overflow = "auto";
       clearTimeout(timer);
@@ -346,36 +355,52 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8 bg-white/5 backdrop-blur-xl border-b border-white/5">
+      <nav className={`fixed top-0 left-0 right-0 z-50 mx-auto flex items-center justify-between px-6 transition-all duration-500 lg:px-8 ${
+        isScrolled 
+          ? "bg-white/90 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.08)] backdrop-blur-2xl border-b border-[#E3D2B5]/30" 
+          : "bg-transparent py-6"
+      }`}>
         <div className="flex items-center gap-4">
-          <div className="overflow-hidden rounded-[1.35rem] border border-white/15 bg-white/95 p-1.5 shadow-[0_18px_45px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+          <div className={`overflow-hidden rounded-[1.35rem] border transition-all duration-500 p-1.5 shadow-[0_18px_45px_rgba(0,0,0,0.2)] backdrop-blur-sm ${
+            isScrolled ? "border-[#E3D2B5]/50 bg-white" : "border-white/15 bg-white/95"
+          }`}>
             <img
               src="/logo.png"
               alt="Kushi Agro Foods logo"
-              className="h-12 w-auto md:h-16"
+              className={`${isScrolled ? "h-10" : "h-12"} w-auto md:h-16 transition-all duration-500`}
             />
           </div>
           <div className="hidden sm:block">
             <h1
-              className="text-4xl font-bold tracking-tight text-white transition-colors md:text-6xl"
+              className={`text-4xl font-bold tracking-tight transition-all duration-500 md:text-6xl ${
+                isScrolled ? "text-[#1D160E]" : "text-white"
+              }`}
               style={{ fontFamily: "Instrument Serif, serif" }}
             >
               Kushi Agro Foods
             </h1>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.34em] text-white/70 md:text-xs">
+            <p className={`mt-1 text-[10px] uppercase tracking-[0.34em] transition-all duration-500 md:text-xs ${
+              isScrolled ? "text-[#8C6A3A]" : "text-white/70"
+            }`}>
               Premium Rice Since 1975
             </p>
           </div>
         </div>
 
         <div className="hidden items-center gap-10 md:flex">
-          <a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="text-xs uppercase tracking-widest font-bold text-white hover:text-[#D7B06B]">
+          <a href="#home" onClick={(e) => handleNavClick(e, 'home')} className={`text-xs uppercase tracking-widest font-bold transition-colors ${
+            isScrolled ? "text-[#1D160E] hover:text-[#8C6A3A]" : "text-white hover:text-[#D7B06B]"
+          }`}>
             Home
           </a>
-          <a href="#products" onClick={(e) => handleNavClick(e, 'products')} className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
+          <a href="#products" onClick={(e) => handleNavClick(e, 'products')} className={`text-xs uppercase tracking-widest font-bold transition-colors ${
+            isScrolled ? "text-[#1D160E]/70 hover:text-[#1D160E]" : "text-white/80 hover:text-white"
+          }`}>
             Products
           </a>
-          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-xs uppercase tracking-widest font-bold text-white/80 hover:text-white">
+          <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className={`text-xs uppercase tracking-widest font-bold transition-colors ${
+            isScrolled ? "text-[#1D160E]/70 hover:text-[#1D160E]" : "text-white/80 hover:text-white"
+          }`}>
             About
           </a>
           {/* Admin link hidden from public as requested */}
@@ -383,13 +408,19 @@ export default function Home() {
             href={WHATSAPP_BASE}
             target="_blank"
             rel="noreferrer"
-            className="rounded-full border border-[#C9B089] px-5 py-2.5 text-sm text-[#1D160E] transition hover:bg-[#EADCC3]"
+            className={`rounded-full border px-5 py-2.5 text-sm transition-all duration-500 ${
+              isScrolled 
+                ? "border-[#1D160E] text-[#1D160E] hover:bg-[#1D160E] hover:text-white" 
+                : "border-[#C9B089] text-white hover:bg-[#EADCC3] hover:text-[#1D160E]"
+            }`}
           >
             WhatsApp
           </a>
           <a
             href={`tel:${PHONE_RAW}`}
-            className="rounded-full bg-[#1D160E] px-5 py-2.5 text-sm text-white transition hover:bg-[#3A2E21]"
+            className={`rounded-full px-5 py-2.5 text-sm text-white transition-all duration-500 ${
+              isScrolled ? "bg-[#8C6A3A] hover:bg-[#1D160E]" : "bg-[#1D160E] hover:bg-[#3A2E21]"
+            }`}
           >
             Call Now
           </a>
@@ -570,36 +601,36 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.05 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: idx * 0.05 }}
                 whileHover={{ 
-                  y: -10,
-                  rotateY: 5,
-                  rotateX: -2,
-                  scale: 1.02,
-                  transition: { duration: 0.3 }
+                  y: -12,
+                  scale: 1.01,
+                  transition: { duration: 0.4 }
                 }}
-                className="min-w-[90%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[2.5rem] border border-[#E3D2B5] bg-[#FFFDF9] shadow-[0_18px_50px_rgba(78,58,31,0.06)] transition-all hover:shadow-2xl group cursor-pointer flex flex-col h-full"
+                className="min-w-[90%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[3rem] border-[1.5px] border-[#E3D2B5] bg-white shadow-[0_20px_50px_rgba(78,58,31,0.04)] transition-all hover:shadow-[0_50px_100px_rgba(78,58,31,0.12)] group cursor-pointer flex flex-col h-full relative"
                 style={{ perspective: "1000px" }}
               >
-
-                <div className={`bg-gradient-to-br ${product.accent} p-[1px]`}>
-                  <div className="aspect-[4/5] bg-white p-6 overflow-hidden relative">
+                {/* Premium Accent Bar */}
+                <div className={`absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r ${product.accent}`} />
+                
+                <div className="p-1.5">
+                  <div className="aspect-[4/5] bg-[#FBF8F2]/40 rounded-[2.5rem] p-10 overflow-hidden relative transition-all duration-700 group-hover:bg-white group-hover:shadow-inner">
                     <img
                       src={product.coverImage}
                       alt={product.name}
                       loading="lazy"
-                      className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110"
+                      className="h-full w-full object-contain transition-transform duration-1000 group-hover:scale-110"
                     />
                     {product.badge && (
-                      <div className="absolute top-4 left-4 z-20">
+                      <div className="absolute top-6 left-6 z-20">
                         <motion.div 
                           initial={{ x: -10, opacity: 0 }}
                           whileInView={{ x: 0, opacity: 1 }}
-                          className={`rounded-lg ${
+                          className={`rounded-xl ${
                             product.badge === 'Top Seller' ? 'bg-[#D7B06B]' : 'bg-[#E23744]'
-                          } px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-white shadow-xl flex items-center gap-2`}
+                          } px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white shadow-2xl flex items-center gap-2.5`}
                         >
-                          <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                           {product.badge}
                         </motion.div>
                       </div>
@@ -1033,20 +1064,35 @@ export default function Home() {
                   </div>
                   
                   <div className="w-full lg:w-1/2 space-y-8">
-                    <div className="space-y-4">
-                      <h5 className="text-xl font-medium text-[#1D160E]">Product Description</h5>
-                      <p className="text-[#5F5548] leading-relaxed">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="h-2 w-2 rounded-full bg-[#D7B06B] animate-pulse" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-[#8C6A3A]">Premium Factory Supply</span>
+                        <div className="ml-auto flex gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <svg key={i} className="w-3.5 h-3.5 fill-[#D7B06B]" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                      <h5 className="text-3xl font-bold text-[#1D160E] leading-tight">Premium Quality Selection</h5>
+                      <div className="mt-4 flex items-baseline gap-3">
+                        <span className="text-4xl font-serif text-[#1D160E]">Price on Inquiry</span>
+                        <span className="text-[10px] text-[#8C6A3A] uppercase tracking-[0.2em] font-bold">(Wholesale & Retail)</span>
+                      </div>
+                      <p className="text-[#5F5548] leading-relaxed text-lg border-l-2 border-[#E3D2B5] pl-6 italic">
                         Our {selectedProduct.name} is selected from the finest harvests, ensuring 
                         consistent quality and superior taste. Perfectly aged and processed to 
                         bring out the authentic aroma.
                       </p>
                     </div>
 
-                    <div className="flex flex-col gap-4">
+                    <div className="sticky bottom-0 bg-[#FFFDF9] pt-6 pb-2 border-t border-[#E5D7BD]/50 flex flex-col gap-4 mt-auto">
                       <button
                         type="button"
                         onClick={() => addToCart(selectedProduct)}
-                        className="w-full rounded-full bg-[#1D160E] px-8 py-5 text-sm font-bold text-white transition hover:bg-[#3A2E21]"
+                        className="w-full rounded-full bg-[#1D160E] px-8 py-5 text-sm font-bold text-white transition hover:bg-[#3A2E21] hover:shadow-xl"
                       >
                         Add To Enquiry Cart
                       </button>
@@ -1055,13 +1101,13 @@ export default function Home() {
                           href={productWhatsAppUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="rounded-full border border-[#D9C8A7] px-6 py-4 text-center text-sm font-medium text-[#1D160E] transition hover:bg-[#F3E7CF]"
+                          className="rounded-full border border-[#D9C8A7] bg-white px-6 py-4 text-center text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
                         >
                           WhatsApp Order
                         </a>
                         <a
                           href={`tel:${PHONE_RAW}`}
-                          className="rounded-full border border-[#D9C8A7] px-6 py-4 text-center text-sm font-medium text-[#1D160E] transition hover:bg-[#F3E7CF]"
+                          className="rounded-full border border-[#D9C8A7] bg-white px-6 py-4 text-center text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
                         >
                           Call Order
                         </a>
