@@ -51,9 +51,9 @@ export const defaultCatalog = [
   },
   {
     id: "06",
-    name: "Golden Chill Economical Range",
+    name: "Golden Chilli Economical Range",
     tagline: "new sona masuri rice",
-    description: "The Golden Chill Economical Range brings **premium quality** to every home. **Freshly harvested** and **hygienically packed**, it offers the **best value** without compromising on purity.",
+    description: "The Golden Chilli Economical Range brings **premium quality** to every home. **Freshly harvested** and **hygienically packed**, it offers the **best value** without compromising on purity.",
     pack: "25 KG",
     views: 2,
     accent: "from-[#171717] to-[#828282]",
