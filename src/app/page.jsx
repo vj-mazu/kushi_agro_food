@@ -768,34 +768,30 @@ export default function Home() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative aspect-[4/5] rounded-[4rem] overflow-hidden shadow-3xl"
+              className="relative aspect-[4/5] rounded-[4rem] overflow-hidden shadow-3xl group"
             >
-              <video 
-                autoPlay 
-                muted 
-                loop 
-                playsInline 
-                poster="/premium-rice.png"
-                className="absolute inset-0 w-full h-full object-cover"
-              >
-                <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27dbed9a9a97e828452c1b96092af6e74723000&profile_id=165&oauth2_token_id=57447761" type="video/mp4" />
-              </video>
-              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-12">
+              <img 
+                src="/paddy-to-rice.png" 
+                alt="From Paddy Fields to Premium Rice" 
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3000ms] group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center p-12 transition-colors duration-700 group-hover:bg-black/10">
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
+                  transition={{ duration: 1 }}
                 >
-                  <p className="text-white text-3xl md:text-4xl font-serif italic mb-4">
-                    "Precision in Every Grain"
+                  <p className="text-white text-3xl md:text-4xl font-serif italic mb-4 drop-shadow-2xl">
+                    "From Fields to Table"
                   </p>
-                  <div className="h-px w-24 bg-[#D7B06B] mx-auto" />
-                  <p className="mt-4 text-white/80 text-sm uppercase tracking-[0.3em]">
-                    Advanced Sortex Technology
+                  <div className="h-px w-24 bg-[#D7B06B] mx-auto shadow-lg" />
+                  <p className="mt-4 text-white text-sm font-bold uppercase tracking-[0.4em] drop-shadow-md">
+                    Direct Factory Supply
                   </p>
                 </motion.div>
               </div>
-
             </motion.div>
           </div>
         </div>
@@ -1082,9 +1078,19 @@ export default function Home() {
                         <span className="text-[10px] text-[#8C6A3A] uppercase tracking-[0.2em] font-bold">(Wholesale & Retail)</span>
                       </div>
                       <p className="text-[#5F5548] leading-relaxed text-lg border-l-2 border-[#E3D2B5] pl-6 italic">
-                        Our {selectedProduct.name} is selected from the finest harvests, ensuring 
-                        consistent quality and superior taste. Perfectly aged and processed to 
-                        bring out the authentic aroma.
+                        {selectedProduct.description ? (
+                          selectedProduct.description.split(/(\*\*.*?\*\*)/g).map((part, i) => 
+                            part.startsWith('**') && part.endsWith('**') ? (
+                              <span key={i} className="text-[#8C6A3A] font-bold">{part.slice(2, -2)}</span>
+                            ) : part
+                          )
+                        ) : (
+                          <>
+                            Our {selectedProduct.name} is selected from the finest harvests, ensuring 
+                            consistent quality and superior taste. Perfectly aged and processed to 
+                            bring out the authentic aroma.
+                          </>
+                        )}
                       </p>
                     </div>
 
