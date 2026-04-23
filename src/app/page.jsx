@@ -75,7 +75,7 @@ function Preloader() {
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
           className="mb-5 text-[11px] uppercase tracking-[0.32em] text-[#D7B06B]"
         >
-          Premium Rice Since 1975
+          Premium Rice Since 1984
         </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 28 }}
@@ -383,7 +383,7 @@ export default function Home() {
             <p className={`mt-1 text-[10px] uppercase tracking-[0.34em] transition-all duration-500 md:text-xs ${
               isScrolled ? "text-[#8C6A3A]" : "text-white/70"
             }`}>
-              Premium Rice Since 1975
+              Premium Rice Since 1984
             </p>
           </div>
         </div>
@@ -817,11 +817,11 @@ export default function Home() {
                 className="mt-8 text-6xl text-[#1D160E] md:text-8xl leading-[1.05]"
                 style={{ fontFamily: "Instrument Serif, serif" }}
               >
-                Legacy Built on <br/> Trust Since 1975
+                Legacy Built on <br/> Trust Since 1984
               </h3>
               <div className="mt-12 space-y-6 text-lg leading-[1.8] text-[#5F5548]">
                 <p>
-                  For over five decades, Kushi Agro Foods has been the cornerstone 
+                  For over four decades, Kushi Agro Foods has been the cornerstone 
                   of premium rice supply in Raichur. Our journey began with a simple vision: 
                   to bring the finest grains from the fertile fields directly to your table.
                 </p>
@@ -833,7 +833,7 @@ export default function Home() {
               </div>
               <div className="mt-12 flex flex-wrap gap-8">
                 <div className="flex flex-col">
-                  <span className="text-4xl font-serif text-[#1D160E]">50+</span>
+                  <span className="text-4xl font-serif text-[#1D160E]">40+</span>
                   <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-1">Years Experience</span>
                 </div>
                 <div className="h-12 w-px bg-[#E3D2B5]" />
@@ -1329,7 +1329,7 @@ export default function Home() {
               </h4>
               <p className="mt-6 max-w-md text-base leading-8 text-white/50">
                 Premium quality rice supply from the heart of Raichur. 
-                Dedicated to purity, heritage, and customer satisfaction since 1975.
+                Dedicated to purity, heritage, and customer satisfaction since 1984.
               </p>
               <div className="mt-10 flex gap-6">
                 {/* Social links placeholder */}
