@@ -295,6 +295,7 @@ export default function Home() {
           playsInline
           className="h-full w-full object-cover"
           style={{ opacity: videoOpacity }}
+          onError={() => setVideoOpacity(1)}
         >
           <source
             src="https://raw.createusercontent.com/63ab3e94-c35b-4564-a8fd-8aea6badd0f8/"
