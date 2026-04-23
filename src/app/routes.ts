@@ -4,8 +4,8 @@ import {
   route,
 } from '@react-router/dev/routes';
 
-// Use Vite's build-time glob to find all page.jsx files
-const pages = import.meta.glob('./**/page.jsx', { eager: true });
+// Use Vite's build-time glob to find all page.jsx files (lazy loading keys only)
+const pages = import.meta.glob('./**/page.jsx');
 
 function generateRoutesFromGlob(): RouteConfigEntry[] {
   const routes: RouteConfigEntry[] = [];
