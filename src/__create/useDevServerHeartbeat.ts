@@ -1,8 +1,10 @@
 import { useIdleTimer } from 'react-idle-timer';
 
 export function useDevServerHeartbeat() {
+  const isDev = import.meta.env.DEV;
+  
   useIdleTimer({
-    disabled: typeof window === 'undefined',
+    disabled: !isDev || typeof window === 'undefined',
     throttle: 60_000 * 3,
     timeout: 60_000,
     onAction: () => {
