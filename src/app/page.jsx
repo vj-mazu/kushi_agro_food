@@ -37,7 +37,7 @@ function Preloader() {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 1.2, delay: 5 }}
+      transition={{ duration: 0.5, delay: 3.5 }}
       onAnimationComplete={() => {
         document.body.style.overflow = "auto";
       }}
@@ -61,12 +61,12 @@ function Preloader() {
           initial={{ opacity: 0, y: 16, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8 overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/95 p-3.5 shadow-[0_30px_90px_rgba(0,0,0,0.35)]"
+          className="mb-8 overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/95 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.35)] max-w-[280px]"
         >
           <img
-            src="/logo.png"
-            alt="Kushi Agro Foods logo"
-            className="h-20 w-auto md:h-32"
+            src="/main-group.jpeg"
+            alt="Vande Matharam Group logo"
+            className="w-full h-auto object-contain"
           />
         </motion.div>
         <motion.p
@@ -200,7 +200,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 5000); // 5 second preloader as requested
+    }, 4000); // 4 second preloader as requested
     return () => {
       document.body.style.overflow = "auto";
       clearTimeout(timer);
@@ -208,15 +208,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    try {
-      const savedCatalog = localStorage.getItem(CATALOG_STORAGE_KEY);
-      if (savedCatalog) {
-        const parsed = JSON.parse(savedCatalog);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(buildCatalogProducts(parsed));
-        }
-      }
-    } catch {}
+    // Force fresh data from defaultCatalog
+    setProducts(buildCatalogProducts(defaultCatalog));
   }, []);
 
   useEffect(() => {
@@ -366,7 +359,7 @@ export default function Home() {
             isScrolled ? "border-[#E3D2B5]/50 bg-white" : "border-white/15 bg-white/95"
           }`}>
             <img
-              src="/logo.png"
+              src="/nav-logo.jpeg"
               alt="Kushi Agro Foods logo"
               className={`${isScrolled ? "h-10" : "h-12"} w-auto md:h-16 transition-all duration-500`}
             />
@@ -584,22 +577,25 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               whileHover={{ 
                 rotateY: 10,
                 rotateX: -5,
                 scale: 1.02,
                 transition: { duration: 0.5 }
               }}
-              className="rounded-[3rem] overflow-hidden shadow-2xl cursor-pointer"
+              className="relative aspect-square md:aspect-auto overflow-hidden rounded-[2.5rem] p-[4px] bg-gradient-to-tr from-[#F28C28] via-[#FFD700] to-[#283890] shadow-[0_20px_60px_rgba(40,56,144,0.25)] flex items-center justify-center cursor-pointer"
               style={{ perspective: "1200px" }}
             >
-              <img 
-                src="/premium-rice.png" 
-                alt="Premium White Rice" 
-                loading="lazy"
-                className="w-full h-[600px] object-cover"
-              />
+              <div className="w-full h-full bg-white rounded-[2.3rem] flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/main-group.jpeg" 
+                  alt="Kushi Agro Main Group" 
+                  loading="lazy"
+                  className="w-full h-[600px] object-contain p-8"
+                />
+              </div>
             </motion.div>
           </div>
         </div>
@@ -844,34 +840,37 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative aspect-[4/5] rounded-[4rem] overflow-hidden shadow-3xl group"
-            >
-              <img 
-                src="/paddy-to-rice.png" 
-                alt="From Paddy Fields to Premium Rice" 
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[3000ms] group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center p-12 transition-colors duration-700 group-hover:bg-black/10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1 }}
-                >
-                  <p className="text-white text-3xl md:text-4xl font-serif italic mb-4 drop-shadow-2xl">
-                    "From Fields to Table"
-                  </p>
-                  <div className="h-px w-24 bg-[#D7B06B] mx-auto shadow-lg" />
-                  <p className="mt-4 text-white text-sm font-bold uppercase tracking-[0.4em] drop-shadow-md">
-                    Direct Factory Supply
-                  </p>
-                </motion.div>
-              </div>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="relative aspect-square md:aspect-[4/5] rounded-[4rem] p-[4px] bg-gradient-to-tr from-[#F28C28] via-[#FFD700] to-[#283890] shadow-[0_20px_60px_rgba(242,140,40,0.2)] group"
+              >
+                <div className="relative w-full h-full rounded-[3.8rem] overflow-hidden bg-[#1A1A1A]">
+                  <img 
+                    src="/paddy-to-rice.png" 
+                    alt="From Paddy Fields to Premium Rice" 
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[3000ms] group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-8 md:p-12 transition-colors duration-700 group-hover:bg-black/20">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1 }}
+                    >
+                      <p className="text-white text-3xl md:text-5xl font-serif italic mb-6 drop-shadow-2xl font-bold">
+                        "From Fields to Table"
+                      </p>
+                      <div className="h-1 w-32 bg-[#FFD700] mx-auto shadow-lg rounded-full" />
+                      <p className="mt-4 text-white text-sm font-bold uppercase tracking-[0.4em] drop-shadow-md">
+                        Direct Factory Supply
+                      </p>
+                    </motion.div>
+                  </div>
+                </div>
             </motion.div>
           </div>
         </div>

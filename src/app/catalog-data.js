@@ -8,6 +8,7 @@ export const defaultCatalog = [
     description: "Experience the **extraordinary aroma** and **perfect texture** of our flagship Zanda Executive rice. Harvested from the **fertile plains**, each grain is **meticulously sorted** for a truly **gourmet dining experience**.",
     pack: "25 KG",
     views: 3,
+    coverImage: "/images/catalog/product-01/showcase.jpeg",
     accent: "from-[#18432A] to-[#6B8D58]",
     badge: "Top Seller",
   },
@@ -29,6 +30,7 @@ export const defaultCatalog = [
     description: "Our Exclusive Range is **double-polished** for a **radiant shine** and **smooth finish**. Ideal for **special occasions**, it provides the **perfect base** for festive rice dishes.",
     pack: "25 KG",
     views: 3,
+    coverImage: "/images/catalog/product-03/showcase.jpeg",
     accent: "from-[#A93D2D] to-[#E58B6E]",
   },
   {
@@ -38,6 +40,7 @@ export const defaultCatalog = [
     description: "Small Boss Platinum features **Blue Lam steam technology**, ensuring that every grain remains **separate and fluffy**. Perfect for **commercial kitchens** and **large gatherings**.",
     pack: "25 KG",
     views: 3,
+    coverImage: "/images/catalog/product-04/showcase.jpeg",
     accent: "from-[#6B124E] to-[#F08BBF]",
   },
   {
@@ -56,6 +59,7 @@ export const defaultCatalog = [
     description: "The Golden Chilli Economical Range brings **premium quality** to every home. **Freshly harvested** and **hygienically packed**, it offers the **best value** without compromising on purity.",
     pack: "25 KG",
     views: 2,
+    coverImage: "/images/catalog/product-06/showcase.jpeg",
     accent: "from-[#171717] to-[#828282]",
   },
   {
@@ -101,6 +105,7 @@ export const defaultCatalog = [
     description: "The M Platinum series represents the **pinnacle of steam rice**. Each grain is **steam-cured** to lock in nutrients and ensure a **firm, non-sticky texture** every time.",
     pack: "25 KG",
     views: 2,
+    coverImage: "/images/catalog/product-11/showcase.jpeg",
     accent: "from-[#B11F21] to-[#FF8A8D]",
   },
   {
@@ -111,6 +116,7 @@ export const defaultCatalog = [
     description: "The **ultimate Biryani rice**. Our Black Pack Jeera Rice is **highly aromatic** and offers the **perfect bite**. A favorite among **professional chefs** for its **consistent results**.",
     pack: "25 KG",
     views: 2,
+    coverImage: "/images/catalog/product-12/showcase.jpeg",
     accent: "from-[#111111] to-[#696969]",
     badge: "Biriyani Special",
   },
@@ -209,6 +215,7 @@ export const defaultCatalog = [
     description: "Naturally **aged for 1 year**, the Gold Range offers the **perfect balance** of taste and health. Each grain is **individually inspected** to ensure **peak freshness**.",
     pack: "25 KG",
     views: 3,
+    coverImage: "/images/catalog/product-24/view-02.jpeg",
     accent: "from-[#394C9E] to-[#93A4F2]",
   },
   {
@@ -218,6 +225,7 @@ export const defaultCatalog = [
     description: "Our **Grand Old Raw Rice** is aged to perfection, making it **extra fluffy** and **flavor-packed**. A **treasured variety** that has been a family favorite for generations.",
     pack: "25 KG",
     views: 3,
+    coverImage: "/images/catalog/product-25/view-02.jpeg",
     accent: "from-[#8B6D10] to-[#D8C15A]",
   },
   {
@@ -228,20 +236,33 @@ export const defaultCatalog = [
     description: "The **ultimate fine bullet rice**. Processed with **extreme precision**, it offers a **smooth, silky finish** and a **delightful aroma** that fills the entire kitchen.",
     pack: "25 KG",
     views: 1,
+    coverImage: "/images/catalog/product-26/showcase.jpeg",
     accent: "from-[#9E178A] to-[#F36DDA]",
   },
 ];
 
 export function buildCatalogProducts(catalog) {
-  return catalog.map((product) => ({
-    ...product,
-    coverImage: product.coverImage || `/images/catalog/product-${product.id}/view-01.jpeg`,
-    images:
-      product.images ||
-      Array.from(
+  return catalog.map((product) => {
+    const defaultCover = `/images/catalog/product-${product.id}/view-01.jpeg`;
+    const coverImage = product.coverImage || defaultCover;
+    
+    let images = product.images;
+    if (!images) {
+      images = Array.from(
         { length: product.views },
         (_, index) =>
-          `/images/catalog/product-${product.id}/view-${String(index + 1).padStart(2, "0")}.jpeg`,
-      ),
-  }));
+          `/images/catalog/product-${product.id}/view-${String(index + 1).padStart(2, "0")}.jpeg`
+      );
+      // If a custom cover image is set (like showcase.jpeg), make sure it's the very first image in the slider
+      if (product.coverImage) {
+        images = [product.coverImage, ...images];
+      }
+    }
+
+    return {
+      ...product,
+      coverImage,
+      images,
+    };
+  });
 }
