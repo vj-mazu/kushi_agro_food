@@ -164,6 +164,207 @@ function createWhatsAppUrl(items) {
   return `${WHATSAPP_BASE}?text=${encodeURIComponent(fullMessage)}`;
 }
 
+function BrandCarousel({ brand, visibleProducts, setSelectedProduct, setActiveImageIndex, addToCart, createWhatsAppUrl, PHONE_RAW }) {
+  const scrollRef = useRef(null);
+  const [activeDot, setActiveDot] = useState(0);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const children = Array.from(container.children);
+      if (children.length === 0) return;
+      
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      
+      children.forEach((child, index) => {
+        const childRect = child.getBoundingClientRect();
+        const childCenter = childRect.left + childRect.width / 2;
+        const distance = Math.abs(containerCenter - childCenter);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+      
+      setActiveDot(closestIndex);
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [visibleProducts.length]);
+
+  const scrollToDot = (index) => {
+    const container = scrollRef.current;
+    const target = container?.children?.[index];
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    setActiveDot(index);
+  };
+
+  return (
+    <motion.div 
+      layout
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="relative"
+    >
+      <div className="flex items-baseline gap-6 mb-4">
+        <h4 className="text-4xl md:text-5xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
+          {brand} <span className="text-2xl opacity-40 font-normal italic">Series</span>
+        </h4>
+        <div className="h-px flex-1 bg-gradient-to-r from-[#E3D2B5] to-transparent opacity-30" />
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="flex gap-8 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 md:overflow-visible"
+      >
+        {visibleProducts.map((product, idx) => (
+          <motion.article
+            layout
+            key={product.id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: idx * 0.05 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20, transition: { duration: 0.4 } }}
+            whileHover={{ 
+              y: -12,
+              scale: 1.01,
+              transition: { duration: 0.4 }
+            }}
+            className="min-w-[85%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[3rem] border-[1.5px] border-[#E3D2B5] bg-white shadow-[0_20px_50px_rgba(78,58,31,0.04)] transition-all hover:shadow-[0_50px_100px_rgba(78,58,31,0.12)] group cursor-pointer flex flex-col relative"
+            style={{ perspective: "1000px" }}
+          >
+            {/* Premium Accent Bar */}
+            <div className={`absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r ${product.accent}`} />
+            
+            <div className="p-1.5">
+              <div className="aspect-[4/5] bg-[#FBF8F2]/40 rounded-[2.5rem] p-10 overflow-hidden relative transition-all duration-700 group-hover:bg-white group-hover:shadow-inner">
+                <img
+                  src={product.coverImage}
+                  alt={product.name}
+                  loading="lazy"
+                  className="h-full w-full object-contain transition-transform duration-1000 group-hover:scale-110"
+                />
+                {product.badge && (
+                  <div className="absolute top-6 left-6 z-20">
+                    <motion.div 
+                      initial={{ x: -10, opacity: 0 }}
+                      whileInView={{ x: 0, opacity: 1 }}
+                      className={`rounded-xl ${
+                        product.badge === 'Top Seller' ? 'bg-[#D7B06B]' : 'bg-[#E23744]'
+                      } px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white shadow-2xl flex items-center gap-2.5`}
+                    >
+                      <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                      {product.badge}
+                    </motion.div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedProduct(product);
+                      setActiveImageIndex(0);
+                    }}
+                    className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:scale-105"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col flex-1 p-8">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8C6A3A] opacity-50" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]/70">
+                      {product.views} views
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-[#8C6A3A] bg-[#F4E6C8]/40 px-3 py-1 rounded-full">
+                    {product.pack}
+                  </span>
+                </div>
+    
+                <div>
+                  <p className={`inline-flex rounded-full bg-gradient-to-r ${product.accent} bg-clip-text text-[10px] font-bold uppercase tracking-[0.28em] text-transparent`}>
+                    Premium Variety
+                  </p>
+                  <h4
+                    className="mt-1 text-3xl text-[#1D160E] leading-tight"
+                    style={{ fontFamily: "Instrument Serif, serif" }}
+                  >
+                    {product.name}
+                    {product.variant && (
+                      <span className="block text-xl opacity-80 mt-0.5 font-normal italic">
+                        {product.variant}
+                      </span>
+                    )}
+                  </h4>
+                  <p className="mt-2 text-sm text-[#5F5548] leading-relaxed font-light">
+                    {product.tagline}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-2.5">
+                <a
+                  href={createWhatsAppUrl([{ ...product, image: product.coverImage, quantity: 1 }])}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => addToCart(product)}
+                  className="flex w-full items-center justify-center rounded-full bg-[#1D160E] px-4 py-3.5 text-[13px] font-semibold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_10px_20px_rgba(29,22,14,0.2)] active:scale-95"
+                >
+                  Order via WhatsApp
+                </a>
+                <a
+                  href={`tel:${PHONE_RAW}`}
+                  onClick={() => addToCart(product)}
+                  className="flex w-full items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-4 py-3.5 text-[13px] font-semibold text-[#1D160E] transition-all hover:bg-[#F3E7CF] hover:border-[#8C6A3A] active:scale-95"
+                >
+                  Call Now
+                </a>
+              </div>
+            </div>
+          </motion.article>
+        ))}
+      </div>
+
+      {/* Mobile Scroll Dots - only visible on mobile */}
+      {visibleProducts.length > 1 && (
+        <div className="flex items-center justify-center gap-2.5 pt-4 pb-6 md:hidden">
+          {visibleProducts.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollToDot(idx)}
+              className={`rounded-full transition-all duration-300 ${
+                activeDot === idx
+                  ? "w-8 h-2.5 bg-[#8C6A3A]"
+                  : "w-2.5 h-2.5 bg-[#D9C8A7] hover:bg-[#B89D6E]"
+              }`}
+              aria-label={`Go to product ${idx + 1}`}
+            />
+          ))}
+          <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-[#8C6A3A]/50">
+            {activeDot + 1}/{visibleProducts.length}
+          </span>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 export default function Home() {
   const [videoOpacity, setVideoOpacity] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -690,136 +891,16 @@ export default function Home() {
                 if (visibleProducts.length === 0) return null;
 
                 return (
-                  <motion.div 
-                    layout
+                  <BrandCarousel
                     key={brand}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="relative"
-                  >
-                    <div className="flex items-baseline gap-6 mb-4">
-                      <h4 className="text-4xl md:text-5xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
-                        {brand} <span className="text-2xl opacity-40 font-normal italic">Series</span>
-                      </h4>
-                      <div className="h-px flex-1 bg-gradient-to-r from-[#E3D2B5] to-transparent opacity-30" />
-                    </div>
-
-                    <div className="flex gap-8 overflow-x-auto pb-10 no-scrollbar snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 md:overflow-visible">
-                      {visibleProducts.map((product, idx) => (
-                        <motion.article
-                          layout
-                          key={product.id}
-                          initial={{ opacity: 0, y: 30 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: idx * 0.05 }}
-                          exit={{ opacity: 0, scale: 0.8, y: 20, transition: { duration: 0.4 } }}
-                          whileHover={{ 
-                            y: -12,
-                            scale: 1.01,
-                            transition: { duration: 0.4 }
-                          }}
-                          className="min-w-[85%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[3rem] border-[1.5px] border-[#E3D2B5] bg-white shadow-[0_20px_50px_rgba(78,58,31,0.04)] transition-all hover:shadow-[0_50px_100px_rgba(78,58,31,0.12)] group cursor-pointer flex flex-col relative"
-                          style={{ perspective: "1000px" }}
-                        >
-                          {/* Premium Accent Bar */}
-                          <div className={`absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r ${product.accent}`} />
-                          
-                          <div className="p-1.5">
-                            <div className="aspect-[4/5] bg-[#FBF8F2]/40 rounded-[2.5rem] p-10 overflow-hidden relative transition-all duration-700 group-hover:bg-white group-hover:shadow-inner">
-                              <img
-                                src={product.coverImage}
-                                alt={product.name}
-                                loading="lazy"
-                                className="h-full w-full object-contain transition-transform duration-1000 group-hover:scale-110"
-                              />
-                              {product.badge && (
-                                <div className="absolute top-6 left-6 z-20">
-                                  <motion.div 
-                                    initial={{ x: -10, opacity: 0 }}
-                                    whileInView={{ x: 0, opacity: 1 }}
-                                    className={`rounded-xl ${
-                                      product.badge === 'Top Seller' ? 'bg-[#D7B06B]' : 'bg-[#E23744]'
-                                    } px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white shadow-2xl flex items-center gap-2.5`}
-                                  >
-                                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                                    {product.badge}
-                                  </motion.div>
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedProduct(product);
-                                    setActiveImageIndex(0);
-                                  }}
-                                  className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:scale-105"
-                                >
-                                  View Details
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col flex-1 p-8">
-                            <div className="flex flex-col gap-4">
-                              <div className="flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-[#8C6A3A] opacity-50" />
-                                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]/70">
-                                    {product.views} views
-                                  </span>
-                                </div>
-                                <span className="text-xs font-bold text-[#8C6A3A] bg-[#F4E6C8]/40 px-3 py-1 rounded-full">
-                                  {product.pack}
-                                </span>
-                              </div>
-              
-                              <div>
-                                <p className={`inline-flex rounded-full bg-gradient-to-r ${product.accent} bg-clip-text text-[10px] font-bold uppercase tracking-[0.28em] text-transparent`}>
-                                  Premium Variety
-                                </p>
-                                <h4
-                                  className="mt-1 text-3xl text-[#1D160E] leading-tight"
-                                  style={{ fontFamily: "Instrument Serif, serif" }}
-                                >
-                                  {product.name}
-                                  {product.variant && (
-                                    <span className="block text-xl opacity-80 mt-0.5 font-normal italic">
-                                      {product.variant}
-                                    </span>
-                                  )}
-                                </h4>
-                                <p className="mt-2 text-sm text-[#5F5548] leading-relaxed font-light">
-                                  {product.tagline}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="mt-6 flex flex-col gap-2.5">
-                              <a
-                                href={createWhatsAppUrl([{ ...product, image: product.coverImage, quantity: 1 }])}
-                                target="_blank"
-                                rel="noreferrer"
-                                onClick={() => addToCart(product)}
-                                className="flex w-full items-center justify-center rounded-full bg-[#1D160E] px-4 py-3.5 text-[13px] font-semibold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_10px_20px_rgba(29,22,14,0.2)] active:scale-95"
-                              >
-                                Order via WhatsApp
-                              </a>
-                              <a
-                                href={`tel:${PHONE_RAW}`}
-                                onClick={() => addToCart(product)}
-                                className="flex w-full items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-4 py-3.5 text-[13px] font-semibold text-[#1D160E] transition-all hover:bg-[#F3E7CF] hover:border-[#8C6A3A] active:scale-95"
-                              >
-                                Call Now
-                              </a>
-                            </div>
-                          </div>
-                        </motion.article>
-                      ))}
-                    </div>
-                  </motion.div>
+                    brand={brand}
+                    visibleProducts={visibleProducts}
+                    setSelectedProduct={setSelectedProduct}
+                    setActiveImageIndex={setActiveImageIndex}
+                    addToCart={addToCart}
+                    createWhatsAppUrl={createWhatsAppUrl}
+                    PHONE_RAW={PHONE_RAW}
+                  />
                 );
               })}
           </div>
