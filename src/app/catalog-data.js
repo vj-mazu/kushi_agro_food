@@ -159,18 +159,6 @@ export const defaultCatalog = [
     badge: "Biriyani Special",
   },
   {
-    id: "26",
-    name: "VM Platinum Range",
-    brand: "VM",
-    variant: "Fine Bullet Rice",
-    tagline: "Ultra quality fine bullet rice",
-    description: "The **ultimate fine bullet rice**. Processed with **extreme precision**, it offers a **smooth, silky finish** and a **delightful aroma** that fills the entire kitchen.",
-    pack: "25 KG",
-    views: 1,
-    coverImage: "/images/catalog/product-26/showcase.jpeg",
-    accent: "from-[#9E178A] to-[#F36DDA]",
-  },
-  {
     id: "08",
     name: "Happy Special Premium Sortex",
     brand: "Happy Special",
