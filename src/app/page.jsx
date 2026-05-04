@@ -1,7 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useInView } from "framer-motion";
+
+
+/* ═══════════════════════════════════════════
+   ANIMATED COUNTER for stats
+   ═══════════════════════════════════════════ */
+function AnimatedCounter({ value, suffix, isVisible: externalIsVisible }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const isVisible = externalIsVisible !== undefined ? externalIsVisible : inView;
+  const numericValue = parseInt(value.replace(/\D/g, ''));
+
+  useEffect(() => {
+    if (!isVisible) return;
+    let start = 0;
+    const duration = 2000;
+    const step = Math.max(1, Math.floor(numericValue / 60));
+    const interval = duration / (numericValue / step);
+    
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= numericValue) {
+        setCount(numericValue);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [isVisible, numericValue]);
+
+  const displayValue = value.includes('k') ? `${(count / 1000).toFixed(count >= numericValue ? 0 : 0)}k` : count.toLocaleString();
+
+  return (
+    <span ref={ref}>{isVisible ? (value === "10000" ? `${Math.floor(count / 1000)}k` : count) : "0"}{suffix}</span>
+  );
+}
 import {
   buildCatalogProducts,
   CATALOG_STORAGE_KEY,
@@ -15,8 +53,8 @@ const GOOGLE_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Kushi+A
 
 
 const stats = [
-  { label: "Years of Heritage", value: "50", suffix: "+" },
-  { label: "Happy Customers", value: "10000", suffix: "+" },
+  { label: "Years Experience", value: "40", suffix: "+" },
+  { label: "Customers Delivered", value: "10", suffix: "k+" },
   { label: "Premium Varieties", value: "25", suffix: "+" },
   { label: "Purity Guarantee", value: "100", suffix: "%" },
 ];
@@ -37,7 +75,7 @@ function Preloader() {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 3.5 }}
+      transition={{ duration: 0.5, delay: 1.5 }}
       onAnimationComplete={() => {
         document.body.style.overflow = "auto";
       }}
@@ -164,203 +202,186 @@ function createWhatsAppUrl(items) {
   return `${WHATSAPP_BASE}?text=${encodeURIComponent(fullMessage)}`;
 }
 
-function BrandCarousel({ brand, visibleProducts, setSelectedProduct, setActiveImageIndex, addToCart, createWhatsAppUrl, PHONE_RAW }) {
-  const scrollRef = useRef(null);
-  const [activeDot, setActiveDot] = useState(0);
+function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActiveImageIndex, addToCart, createWhatsAppUrl, PHONE_RAW }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const containerRef = useRef(null);
+  const autoPlayRef = useRef(null);
 
+  const totalProducts = visibleProducts.length;
+
+  // Auto-play
   useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
+    if (totalProducts <= 1) return;
+    autoPlayRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % totalProducts);
+    }, 5000);
+    return () => clearInterval(autoPlayRef.current);
+  }, [totalProducts]);
 
-    const handleScroll = () => {
-      const children = Array.from(container.children);
-      if (children.length === 0) return;
-      
-      const containerRect = container.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
-      
-      let closestIndex = 0;
-      let closestDistance = Infinity;
-      
-      children.forEach((child, index) => {
-        const childRect = child.getBoundingClientRect();
-        const childCenter = childRect.left + childRect.width / 2;
-        const distance = Math.abs(containerCenter - childCenter);
-        
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
-      
-      setActiveDot(closestIndex);
-    };
+  const resetAutoPlay = () => {
+    clearInterval(autoPlayRef.current);
+    autoPlayRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % totalProducts);
+    }, 5000);
+  };
 
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, [visibleProducts.length]);
+  const goTo = (index) => {
+    setActiveIndex(index);
+    resetAutoPlay();
+  };
 
-  const scrollToDot = (index) => {
-    const container = scrollRef.current;
-    const target = container?.children?.[index];
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    setActiveDot(index);
+  const goNext = () => goTo((activeIndex + 1) % totalProducts);
+  const goPrev = () => goTo((activeIndex - 1 + totalProducts) % totalProducts);
+
+  // Calculate 3D position for each card
+  const getCardStyle = (index) => {
+    let diff = index - activeIndex;
+    if (diff > totalProducts / 2) diff -= totalProducts;
+    if (diff < -totalProducts / 2) diff += totalProducts;
+
+    const isActive = diff === 0;
+    const absDistance = Math.abs(diff);
+    
+    const translateX = diff * 350;
+    const translateZ = isActive ? 120 : -(absDistance * 180);
+    const rotateY = diff * -20; // Reduced rotation for better readability
+    const scale = isActive ? 1.05 : Math.max(0.7, 1 - absDistance * 0.15);
+    const opacity = absDistance > 1.5 ? 0 : Math.max(0.4, 1 - absDistance * 0.4);
+    const zIndex = 10 - absDistance;
+
+    return { translateX, translateZ, rotateY, scale, opacity, zIndex, isActive };
   };
 
   return (
     <motion.div 
-      layout
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="relative"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+      className="relative z-10 w-full"
     >
-      <div className="flex items-baseline gap-6 mb-4">
-        <h4 className="text-4xl md:text-5xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
-          {brand} <span className="text-2xl opacity-40 font-normal italic">Series</span>
+      {/* Brand Header */}
+      <div className="flex items-baseline gap-6 mb-12 px-4">
+        <h4 className="text-4xl md:text-5xl text-[#1D160E] whitespace-nowrap" style={{ fontFamily: "Instrument Serif, serif" }}>
+          {brand}
         </h4>
-        <div className="h-px flex-1 bg-gradient-to-r from-[#E3D2B5] to-transparent opacity-30" />
+        <div className="h-px flex-1 bg-[#E3D2B5] opacity-20" />
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex gap-8 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 md:overflow-visible"
-      >
-        {visibleProducts.map((product, idx) => (
-          <motion.article
-            layout
-            key={product.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: idx * 0.05 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20, transition: { duration: 0.4 } }}
-            whileHover={{ 
-              y: -12,
-              scale: 1.01,
-              transition: { duration: 0.4 }
-            }}
-            className="min-w-[85%] sm:min-w-[45%] md:min-w-0 snap-center overflow-hidden rounded-[3rem] border-[1.5px] border-[#E3D2B5] bg-white shadow-[0_20px_50px_rgba(78,58,31,0.04)] transition-all hover:shadow-[0_50px_100px_rgba(78,58,31,0.12)] group cursor-pointer flex flex-col relative"
-            style={{ perspective: "1000px" }}
-          >
-            {/* Premium Accent Bar */}
-            <div className={`absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r ${product.accent}`} />
+      {/* 3D Slider */}
+      <div className="slider-3d-container relative h-[600px] w-full flex items-center justify-center overflow-visible">
+        <div className="slider-3d-track relative flex items-center justify-center w-full h-full" style={{ perspective: "1500px" }}>
+          {visibleProducts.map((product, index) => {
+            const style = getCardStyle(index);
             
-            <div className="p-1.5">
-              <div className="aspect-[4/5] bg-[#FBF8F2]/40 rounded-[2.5rem] p-10 overflow-hidden relative transition-all duration-700 group-hover:bg-white group-hover:shadow-inner">
-                <img
-                  src={product.coverImage}
-                  alt={product.name}
-                  loading="lazy"
-                  className="h-full w-full object-contain transition-transform duration-1000 group-hover:scale-110"
-                />
-                {product.badge && (
-                  <div className="absolute top-6 left-6 z-20">
-                    <motion.div 
-                      initial={{ x: -10, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      className={`rounded-xl ${
-                        product.badge === 'Top Seller' ? 'bg-[#D7B06B]' : 'bg-[#E23744]'
-                      } px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-white shadow-2xl flex items-center gap-2.5`}
-                    >
-                      <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                      {product.badge}
-                    </motion.div>
+            return (
+              <motion.article
+                key={product.id}
+                className={`slider-3d-card absolute ${style.isActive ? 'active' : ''}`}
+                style={{
+                  width: "min(360px, 90vw)",
+                  transformStyle: "preserve-3d",
+                  zIndex: Math.round(style.zIndex * 10),
+                  pointerEvents: style.isActive ? "auto" : "none",
+                }}
+                animate={{
+                  x: style.translateX,
+                  z: style.translateZ,
+                  rotateY: style.rotateY,
+                  scale: style.scale,
+                  opacity: style.opacity,
+                  transition: { 
+                    type: "spring",
+                    stiffness: 45, // Softer spring for luxury feel
+                    damping: 18,
+                    mass: 0.8
+                  }
+                }}
+                onClick={() => style.isActive && setSelectedProduct(product)}
+              >
+                <div className="relative h-[480px] w-full rounded-[3.5rem] bg-white p-10 shadow-[0_40px_100px_rgba(29,22,14,0.1)] overflow-hidden border border-[#E3D2B5]/50 transition-all duration-700 hover:shadow-[0_50px_120px_rgba(29,22,14,0.15)]">
+                  {/* Subtle glass sheen */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none" />
+                  
+                  <div className="relative h-60 w-full flex items-center justify-center mb-6">
+                    <motion.img
+                      src={product.coverImage}
+                      alt={product.name}
+                      className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                      animate={style.isActive ? { 
+                        y: [0, -12, 0],
+                      } : { y: 0 }}
+                      transition={{ 
+                        duration: 6, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      }}
+                    />
                   </div>
-                )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedProduct(product);
-                      setActiveImageIndex(0);
-                    }}
-                    className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:scale-105"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col flex-1 p-8">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8C6A3A] opacity-50" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C6A3A]/70">
-                      {product.views} views
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold text-[#8C6A3A] bg-[#F4E6C8]/40 px-3 py-1 rounded-full">
-                    {product.pack}
-                  </span>
-                </div>
-    
-                <div>
-                  <p className={`inline-flex rounded-full bg-gradient-to-r ${product.accent} bg-clip-text text-[10px] font-bold uppercase tracking-[0.28em] text-transparent`}>
-                    Premium Variety
-                  </p>
-                  <h4
-                    className="mt-1 text-3xl text-[#1D160E] leading-tight"
-                    style={{ fontFamily: "Instrument Serif, serif" }}
-                  >
-                    {product.name}
-                    {product.variant && (
-                      <span className="block text-xl opacity-80 mt-0.5 font-normal italic">
-                        {product.variant}
-                      </span>
-                    )}
-                  </h4>
-                  <p className="mt-2 text-sm text-[#5F5548] leading-relaxed font-light">
-                    {product.tagline}
-                  </p>
-                </div>
-              </div>
 
-              <div className="mt-6 flex flex-col gap-2.5">
-                <a
-                  href={createWhatsAppUrl([{ ...product, image: product.coverImage, quantity: 1 }])}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => addToCart(product)}
-                  className="flex w-full items-center justify-center rounded-full bg-[#1D160E] px-4 py-3.5 text-[13px] font-semibold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_10px_20px_rgba(29,22,14,0.2)] active:scale-95"
-                >
-                  Order via WhatsApp
-                </a>
-                <a
-                  href={`tel:${PHONE_RAW}`}
-                  onClick={() => addToCart(product)}
-                  className="flex w-full items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-4 py-3.5 text-[13px] font-semibold text-[#1D160E] transition-all hover:bg-[#F3E7CF] hover:border-[#8C6A3A] active:scale-95"
-                >
-                  Call Now
-                </a>
-              </div>
-            </div>
-          </motion.article>
-        ))}
+                  <div className="text-center relative z-10">
+                    <p className="text-[9px] uppercase tracking-[0.5em] text-[#D7B06B] font-bold mb-3">
+                      {product.brand}
+                    </p>
+                    <h4 className="text-2xl md:text-3xl font-normal text-[#1D160E] leading-tight mb-2" style={{ fontFamily: "Instrument Serif, serif" }}>
+                      {product.name}
+                    </h4>
+                    {product.variant && (
+                      <p className="text-sm italic text-[#8C6A3A]/70 mb-6">{product.variant}</p>
+                    )}
+                    <p className="text-xs font-bold text-[#8C6A3A] mb-8 bg-[#FBF8F2] py-2 px-4 rounded-full inline-block">
+                      {product.pack} Pack
+                    </p>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product);
+                      }}
+                      className="group relative w-full py-4 rounded-full bg-[#1D160E] text-white text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-[#8C6A3A] overflow-hidden shadow-lg"
+                    >
+                      <span className="relative z-10">Add to Enquiry</span>
+                      <div className="absolute inset-0 -translate-x-full bg-[#8C6A3A] transition-transform duration-500 group-hover:translate-x-0" />
+                    </button>
+                  </div>
+                </div>
+              </motion.article>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Mobile Scroll Dots - only visible on mobile */}
-      {visibleProducts.length > 1 && (
-        <div className="flex items-center justify-center gap-2.5 pt-4 pb-6 md:hidden">
-          {visibleProducts.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => scrollToDot(idx)}
-              className={`rounded-full transition-all duration-300 ${
-                activeDot === idx
-                  ? "w-8 h-2.5 bg-[#8C6A3A]"
-                  : "w-2.5 h-2.5 bg-[#D9C8A7] hover:bg-[#B89D6E]"
-              }`}
-              aria-label={`Go to product ${idx + 1}`}
-            />
-          ))}
-          <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-[#8C6A3A]/50">
-            {activeDot + 1}/{visibleProducts.length}
-          </span>
+      {/* Slider Progress & Navigation */}
+      <div className="mx-auto max-w-xs mt-10 space-y-8">
+        <div className="slider-progress w-full">
+          <div 
+            className="slider-progress-fill" 
+            style={{ width: `${((activeIndex + 1) / totalProducts) * 100}%` }}
+          />
         </div>
-      )}
+        
+        <div className="flex items-center justify-between gap-6 px-4">
+          <button onClick={goPrev} className="slider-nav-btn text-[#1D160E] hover:text-white">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          
+          <div className="flex items-center gap-3">
+            {visibleProducts.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  activeIndex === i ? "w-8 bg-[#1D160E]" : "w-1.5 bg-[#D9C8A7]"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button onClick={goNext} className="slider-nav-btn text-[#1D160E] hover:text-white">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -379,7 +400,16 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const availableBrands = ["All Brands", ...new Set(products.map(p => p.brand))];
+  const availableBrands = [
+    "All Brands",
+    "Vandematharam",
+    "VM Bullet",
+    "VM",
+    "Happy Special",
+    "Zanda",
+    "Golden Chilli",
+    "Small Boss"
+  ];
   
   const groupedProducts = products.reduce((acc, product) => {
     if (!acc[product.brand]) acc[product.brand] = [];
@@ -412,7 +442,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       document.body.style.overflow = "auto";
-    }, 4000); // 4 second preloader as requested
+    }, 2000); // Optimized preloader timing
     return () => {
       document.body.style.overflow = "auto";
       clearTimeout(timer);
@@ -715,34 +745,81 @@ export default function Home() {
 
       <section
         id="home"
-        className="relative z-10 mx-auto max-w-7xl px-6 pb-20 pt-10 lg:px-8 lg:pb-32 lg:pt-16"
+        className="relative z-10 mx-auto max-w-7xl px-6 pb-20 pt-32 lg:px-8 lg:pb-32 lg:pt-40"
       >
         <div className="flex min-h-[70vh] flex-col items-center justify-center text-center">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
-            className="max-w-4xl space-y-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="max-w-4xl space-y-10 relative"
           >
+            {/* Floating grain particles decoration */}
+            <div className="absolute -top-20 -left-20 w-40 h-40 pointer-events-none hidden lg:block">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1.5 h-3 rounded-full bg-[#D7B06B]/30"
+                  style={{
+                    left: `${20 + i * 25}%`,
+                    top: `${10 + i * 18}%`,
+                  }}
+                  animate={{
+                    y: [0, -20, 0],
+                    rotate: [0, 15, 0],
+                    opacity: [0.3, 0.8, 0.3],
+                  }}
+                  transition={{
+                    duration: 3 + i * 0.5,
+                    repeat: Infinity,
+                    delay: i * 0.4,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+
             <div className="space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.38em] text-[#D7B06B] md:text-sm">
+              {/* Staggered text reveal */}
+              <motion.p 
+                initial={{ opacity: 0, y: 20, clipPath: "inset(100% 0 0 0)" }}
+                animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
+                transition={{ duration: 0.8, delay: 1.8, ease: [0.22, 1, 0.36, 1] }}
+                className="text-xs font-semibold uppercase tracking-[0.38em] text-[#D7B06B] md:text-sm"
+              >
                 Premium Rice Manufacturing
-              </p>
-              <h2
+              </motion.p>
+              
+              <motion.h2
+                initial={{ opacity: 0, y: 60, clipPath: "inset(100% 0 0 0)" }}
+                animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
+                transition={{ duration: 1.2, delay: 2.0, ease: [0.22, 1, 0.36, 1] }}
                 className="text-5xl leading-none text-white md:text-7xl lg:text-8xl drop-shadow-lg"
                 style={{ fontFamily: "Instrument Serif, serif" }}
               >
                 Quality rice brands for homes, stores, and wholesale buyers.
-              </h2>
-              <p className="mx-auto max-w-2xl text-base leading-8 text-white/90 md:text-lg drop-shadow-md">
-                Kushi Agro Foods supplies trusted rice collections with clean grading, dependable packing, and fast direct order support.
-              </p>
+              </motion.h2>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 30, clipPath: "inset(100% 0 0 0)" }}
+                animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
+                transition={{ duration: 1, delay: 2.3, ease: [0.22, 1, 0.36, 1] }}
+                className="mx-auto max-w-2xl text-base leading-8 text-white/90 md:text-lg drop-shadow-md"
+              >
+                Trusted rice manufacturing, premium sourcing, and direct supply support for homes, retail counters, and wholesale buyers.
+              </motion.p>
             </div>
-            <div className="flex flex-col gap-6 sm:flex-row sm:justify-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 40, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.9, delay: 2.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col gap-6 sm:flex-row sm:justify-center"
+            >
               <a
                 href="#products"
                 onClick={(e) => handleNavClick(e, 'products')}
-                className="group relative flex items-center justify-center overflow-hidden rounded-full bg-[#1D160E] px-14 py-6 text-sm font-bold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)]"
+                className="group relative flex items-center justify-center overflow-hidden rounded-full bg-[#1D160E] px-14 py-6 text-sm font-bold text-white transition-all hover:bg-[#3A2E21] hover:shadow-[0_20px_50px_rgba(0,0,0,0.2)] shimmer-overlay"
               >
                 <span className="relative z-10">Browse Our Products</span>
                 <div className="absolute inset-0 -translate-x-full bg-white/10 transition-transform duration-500 group-hover:translate-x-0" />
@@ -756,42 +833,95 @@ export default function Home() {
                 <span className="relative z-10">Order On WhatsApp</span>
                 <div className="absolute inset-0 -translate-x-full bg-[#C9B089]/10 transition-transform duration-500 group-hover:translate-x-0" />
               </a>
-            </div>
+            </motion.div>
+            
+            {/* Scroll indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 3.2, duration: 1 }}
+              className="flex flex-col items-center gap-3 pt-8"
+            >
+              <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">Scroll to explore</span>
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="w-5 h-8 rounded-full border-2 border-white/20 flex items-start justify-center pt-1.5"
+              >
+                <div className="w-1 h-2 rounded-full bg-white/50" />
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      <section id="philosophy" className="relative z-10 bg-white px-6 py-32 lg:px-8">
+      <section id="philosophy" className="relative z-10 bg-white px-6 py-32 lg:px-8 overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-20 lg:grid-cols-[1.2fr_0.8fr] items-center">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -80 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
               className="relative"
             >
-              <span className="absolute -left-10 -top-10 text-[20rem] font-serif text-[#F4E6C8]/30 leading-none select-none">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.5 }}
+                className="absolute -left-20 top-1/2 -translate-y-1/2 hidden lg:block"
+                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)' }}
+              >
+                <span className="text-[12rem] font-serif font-black text-[#F4E6C8]/20 select-none tracking-tighter whitespace-nowrap">
+                  VANDE MATHARAM
+                </span>
+              </motion.div>
+              
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute -left-10 -top-10 text-[20rem] font-serif text-[#F4E6C8]/30 leading-none select-none"
+              >
                 &ldquo;
-              </span>
-              <h2 
+              </motion.span>
+              <motion.h2 
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="relative z-10 text-5xl md:text-7xl lg:text-8xl text-[#1D160E] leading-tight"
                 style={{ fontFamily: "Instrument Serif, serif" }}
               >
                 {philosophy.quote}
-              </h2>
-              <div className="mt-12 flex items-center gap-6">
-                <div className="h-px w-20 bg-[#8C6A3A]" />
+              </motion.h2>
+              <motion.div 
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-12 flex items-center gap-6"
+              >
+                <motion.div 
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                  className="h-px w-20 bg-[#8C6A3A] origin-left" 
+                />
                 <p className="text-sm uppercase tracking-[0.4em] text-[#8C6A3A] font-bold">
                   {philosophy.author}
                 </p>
-              </div>
+              </motion.div>
             </motion.div>
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.85, rotateY: -15, clipPath: "inset(20% 20% 20% 20%)" }}
+              whileInView={{ opacity: 1, scale: 1, rotateY: 0, clipPath: "inset(0 0 0 0)" }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ 
                 rotateY: 10,
                 rotateX: -5,
@@ -838,7 +968,7 @@ export default function Home() {
                   {stat.label}
                 </p>
                 <p className="mt-4 text-6xl font-normal text-white md:text-7xl" style={{ fontFamily: "Instrument Serif, serif" }}>
-                  {stat.value}{stat.suffix}
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </p>
               </motion.div>
             ))}
@@ -846,12 +976,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="products" className="relative z-10 bg-[#FFFDF9] px-6 py-28 lg:px-8">
+      <section id="products" className="relative z-10 bg-[#FFFDF9] px-6 py-28 lg:px-8 overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-10"
           >
             <div>
@@ -865,7 +996,8 @@ export default function Home() {
                 Curated Selection of <br/> Premium Rice Brands
               </h3>
             </div>
-            
+
+
             <div className="flex flex-wrap gap-3 mt-8 lg:mt-0">
               {availableBrands.map((brand) => (
                 <button
@@ -883,41 +1015,62 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <div className="space-y-8">
-            {Object.entries(groupedProducts)
-              .filter(([brand]) => selectedBrand === "All Brands" || selectedBrand === brand)
-              .map(([brand, brandProducts]) => {
-                const visibleProducts = brandProducts.filter(p => !cartItems.some(item => item.id === p.id));
-                if (visibleProducts.length === 0) return null;
+          <div className="space-y-24">
+            {(() => {
+              const brandOrder = [
+                "Vandematharam",
+                "VM Bullet",
+                "VM",
+                "Happy Special",
+                "Zanda",
+                "Golden Chilli",
+                "Small Boss"
+              ];
 
-                return (
-                  <BrandCarousel
-                    key={brand}
-                    brand={brand}
-                    visibleProducts={visibleProducts}
-                    setSelectedProduct={setSelectedProduct}
-                    setActiveImageIndex={setActiveImageIndex}
-                    addToCart={addToCart}
-                    createWhatsAppUrl={createWhatsAppUrl}
-                    PHONE_RAW={PHONE_RAW}
-                  />
-                );
-              })}
+              return brandOrder
+                .filter(name => selectedBrand === "All Brands" || selectedBrand === name)
+                .map((brandName) => {
+                  const brandProducts = groupedProducts[brandName];
+                  if (!brandProducts || brandProducts.length === 0) return null;
+
+                  const sortedProducts = [...brandProducts].sort((a, b) => {
+                    if (a.isLast) return 1;
+                    if (b.isLast) return -1;
+                    return 0;
+                  });
+
+                  const visibleProducts = sortedProducts.filter(
+                    (p) => !cartItems.some((item) => item.id === p.id)
+                  );
+
+                  if (visibleProducts.length === 0) return null;
+
+                  return (
+                    <BrandCarousel3D
+                      key={brandName}
+                      brand={brandName}
+                      visibleProducts={visibleProducts}
+                      setSelectedProduct={setSelectedProduct}
+                      setActiveImageIndex={setActiveImageIndex}
+                      addToCart={addToCart}
+                      createWhatsAppUrl={createWhatsAppUrl}
+                      PHONE_RAW={PHONE_RAW}
+                    />
+                  );
+                });
+            })()}
           </div>
-
-
-
         </div>
       </section>
 
-      <section id="about" className="relative z-10 bg-[#FBF8F2] px-6 py-40 lg:px-8">
+      <section id="about" className="relative z-10 bg-[#FBF8F2] px-6 py-20 lg:py-40 lg:px-8 overflow-hidden">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-20 lg:grid-cols-[1fr_1fr] items-center">
+          <div className="grid gap-20 lg:grid-cols-[1.2fr_0.8fr] items-center">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -60 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="text-sm uppercase tracking-[0.4em] text-[#8C6A3A] font-bold">
                 The Heritage Story
@@ -928,36 +1081,59 @@ export default function Home() {
               >
                 Legacy Built on <br/> Trust Since 1984
               </h3>
-              <div className="mt-12 space-y-6 text-lg leading-[1.8] text-[#5F5548]">
-                <p>
-                  For over four decades, Kushi Agro Foods has been the cornerstone 
-                  of premium rice supply in Raichur. Our journey began with a simple vision: 
-                  to bring the finest grains from the fertile fields directly to your table.
-                </p>
-                <p>
-                  Today, we serve over 10,000 happy families and institutional buyers across 
-                  the country. Our state-of-the-art Sortex processing facility ensures that 
-                  every grain meet the highest standards of purity and hygiene.
-                </p>
-              </div>
-              <div className="mt-12 flex flex-wrap gap-8">
-                <div className="flex flex-col">
-                  <span className="text-4xl font-serif text-[#1D160E]">40+</span>
-                  <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-1">Years Experience</span>
+              
+              <div className="mt-12 space-y-8">
+                <div className="space-y-6 text-lg leading-[1.8] text-[#5F5548]">
+                  <p>
+                    For over five decades, Kushi Agro Foods has been the cornerstone 
+                    of premium rice supply in Raichur. Our journey began with a simple vision: 
+                    to bring the finest grains from the fertile fields directly to your table.
+                  </p>
+                  <p>
+                    Today, we serve over 10,000 happy families and institutional buyers across 
+                    the country. Our state-of-the-art Sortex processing facility ensures that 
+                    every grain meets the highest standards of purity and hygiene.
+                  </p>
                 </div>
-                <div className="h-12 w-px bg-[#E3D2B5]" />
-                <div className="flex flex-col">
-                  <span className="text-4xl font-serif text-[#1D160E]">10k+</span>
-                  <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-1">Customers Delivered</span>
+
+                {/* Founder's Quote */}
+                <div className="relative pl-12 border-l-2 border-[#D7B06B]/30 py-4 italic">
+                  <p className="text-2xl text-[#1D160E] font-serif leading-relaxed">
+                    "Quality is not an act, it is a habit. At Kushi Agro, we don't just sell rice; we deliver trust in every grain."
+                  </p>
+                  <p className="mt-4 text-sm uppercase tracking-widest text-[#8C6A3A] font-bold">
+                    — Founder, Kushi Agro Foods
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-12 pt-8">
+                  <div className="flex flex-col">
+                    <span className="text-5xl font-serif text-[#1D160E]">
+                      <AnimatedCounter value="40" suffix="+" />
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-2">Years Experience</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-5xl font-serif text-[#1D160E]">
+                      <AnimatedCounter value="50" suffix="k+" />
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-2">Customers Delivered</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-5xl font-serif text-[#1D160E]">
+                      <AnimatedCounter value="100" suffix="%" />
+                    </span>
+                    <span className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-2">Purity Guarantee</span>
+                  </div>
                 </div>
               </div>
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.85, clipPath: "inset(30% 30% 30% 30%)" }}
+                whileInView={{ opacity: 1, scale: 1, clipPath: "inset(0 0 0 0)" }}
                 viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1, ease: "easeOut" }}
+                transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="relative aspect-square md:aspect-[4/5] rounded-[4rem] p-[4px] bg-gradient-to-tr from-[#F28C28] via-[#FFD700] to-[#283890] shadow-[0_20px_60px_rgba(242,140,40,0.2)] group"
               >
                 <div className="relative w-full h-full rounded-[3.8rem] overflow-hidden bg-[#1A1A1A]">
@@ -988,13 +1164,15 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="relative z-10 bg-white px-6 py-28 lg:px-8">
+
+      <section className="relative z-10 bg-white px-6 py-16 lg:py-28 lg:px-8 overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-center text-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
               className="max-w-3xl"
             >
               <p className="text-sm uppercase tracking-[0.4em] text-[#8C6A3A] font-bold">
@@ -1006,43 +1184,60 @@ export default function Home() {
               >
                 Awarded for Outstanding <br/> Contribution at Karnataka Invest 2025
               </h3>
+              <p className="mt-8 text-xl text-[#8C6A3A] font-medium italic">
+                Part of the Vande Matharam Group — Since 1975
+              </p>
             </motion.div>
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-white max-w-2xl w-full aspect-[3/4] relative mx-auto"
+              initial={{ opacity: 0, scale: 0.8, rotateX: 10, y: 50 }}
+              whileInView={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ 
+                rotateY: 5,
+                rotateX: -5,
+                scale: 1.02,
+                transition: { duration: 0.5 }
+              }}
+              className="mt-16 overflow-hidden rounded-[3rem] shadow-[0_30px_100px_rgba(215,176,107,0.15)] bg-white max-w-2xl w-full aspect-[3/4] relative mx-auto cursor-pointer"
+              style={{ perspective: "1500px" }}
             >
               <img 
                 src="/karnataka-award-2025.png" 
                 alt="Karnataka Invest 2025 Award" 
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1D160E]/20 to-transparent pointer-events-none" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      <section id="testimonials" className="relative z-10 bg-white px-6 py-40 lg:px-8">
+      <section id="testimonials" className="relative z-10 bg-white px-6 py-20 lg:py-40 lg:px-8 overflow-hidden">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-24">
+          <motion.div 
+            initial={{ opacity: 0, y: 40, clipPath: "inset(100% 0 0 0)" }}
+            whileInView={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center mb-24"
+          >
             <p className="text-sm uppercase tracking-[0.5em] text-[#8C6A3A] font-bold">
               Customer Voices
             </p>
             <h3 className="mt-8 text-6xl md:text-8xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
               Trusted Excellence
             </h3>
-          </div>
+          </motion.div>
           <div className="grid gap-12 md:grid-cols-3">
             {testimonials.map((t, idx) => (
               <motion.div
                 key={t.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
+                initial={{ opacity: 0, y: 60, rotateX: 15, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: idx * 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ 
                   scale: 1.05,
                   rotateY: -8,
@@ -1066,91 +1261,6 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" className="relative z-10 bg-[#120F0B] px-6 py-40 text-white lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-20 lg:grid-cols-[1fr_1.1fr] items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <p className="text-sm uppercase tracking-[0.5em] text-[#D7B06B] font-bold">
-                Inquiries & Orders
-              </p>
-              <h3
-                className="mt-8 text-6xl md:text-8xl leading-[1.05]"
-                style={{ fontFamily: "Instrument Serif, serif" }}
-              >
-                Connect with <br/> our Sales Team
-              </h3>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-[#E7D8C4]/60">
-                Confirm stock availability, request bulk pricing, and coordinate delivery 
-                directly with our Raichur-based team. We offer fast support for retail 
-                and institutional supply.
-              </p>
-            </motion.div>
-
-            <div className="grid gap-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-10 backdrop-blur-md">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#D7B06B] font-bold">
-                    WhatsApp Orders
-                  </p>
-                  <p className="mt-6 text-xl text-white/90 leading-relaxed font-serif">
-                    Send your cart instantly for a quick quote.
-                  </p>
-                  <a
-                    href={whatsappCartUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-8 inline-flex rounded-full bg-white px-8 py-4 text-sm font-bold text-[#1D160E] transition hover:bg-[#F6E6C9]"
-                  >
-                    Open WhatsApp
-                  </a>
-                </div>
-
-                <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-10 backdrop-blur-md">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#D7B06B] font-bold">
-                    Call Orders
-                  </p>
-                  <p className="mt-6 text-xl text-white/90 leading-relaxed font-serif">{PHONE_DISPLAY}</p>
-                  <a
-                    href={`tel:${PHONE_RAW}`}
-                    className="mt-8 inline-flex rounded-full border border-white/20 px-8 py-4 text-sm font-bold text-white transition hover:bg-white/10"
-                  >
-                    Call Now
-                  </a>
-                </div>
-              </div>
-
-              <motion.a 
-                href={GOOGLE_MAPS_URL}
-                target="_blank"
-                rel="noreferrer"
-                whileHover={{ 
-                  scale: 1.02,
-                  rotateX: 5,
-                  transition: { duration: 0.3 }
-                }}
-                className="rounded-[2.5rem] border border-white/5 bg-white/[0.03] p-10 backdrop-blur-md transition hover:bg-white/[0.06] group block"
-                style={{ perspective: "1000px" }}
-              >
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[#D7B06B] font-bold">
-                  Visit Address
-                </p>
-                <p className="mt-6 text-xl leading-relaxed text-white/90 font-serif group-hover:text-[#D7B06B] transition-colors">
-                  Industrial Area, Raichur-Hyderabad Rd, Rajendra Gunj, Raichur, Karnataka 584102
-                </p>
-                <p className="mt-6 text-[10px] text-white/30 uppercase tracking-[0.4em]">
-                  View on Google Maps →
-                </p>
-              </motion.a>
-            </div>
           </div>
         </div>
       </section>
@@ -1434,9 +1544,105 @@ export default function Home() {
           </aside>
         </div>
       )}
-      <footer className="relative z-10 bg-[#0E0E0E] pt-24 pb-12 text-white">
+      <section id="contact" className="relative z-10 bg-[#FFFDF9] px-6 py-20 lg:py-40 lg:px-8 overflow-hidden">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 100 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden rounded-[4rem] bg-[#1D160E] p-12 lg:p-24 text-center text-white"
+          >
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat" />
+            </div>
+            
+            <div className="relative z-10 max-w-3xl mx-auto space-y-10">
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="text-xs font-bold uppercase tracking-[0.5em] text-[#D7B06B]"
+              >
+                Start Your Partnership
+              </motion.p>
+              <motion.h3 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="text-5xl md:text-7xl lg:text-8xl leading-tight"
+                style={{ fontFamily: "Instrument Serif, serif" }}
+              >
+                Ready to Experience <br/> Pure Rice Perfection?
+              </motion.h3>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.7 }}
+                className="text-lg text-white/60 leading-relaxed max-w-xl mx-auto"
+              >
+                Whether you're a distributor, retailer, or home chef, we have the perfect harvest waiting for you. Get in touch for wholesale pricing and direct delivery.
+              </motion.p>
+              
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.9, duration: 0.8 }}
+                className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10"
+              >
+                <a
+                  href={`tel:${PHONE_RAW}`}
+                  className="group relative flex items-center justify-center overflow-hidden rounded-full bg-[#D7B06B] px-14 py-6 text-sm font-bold text-[#1D160E] transition-all hover:bg-white hover:shadow-[0_20px_50px_rgba(215,176,107,0.3)]"
+                >
+                  <span className="relative z-10">Call Direct Now</span>
+                  <div className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
+                </a>
+                <a
+                  href={whatsappCartUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative flex items-center justify-center overflow-hidden rounded-full border-2 border-white/20 px-14 py-6 text-sm font-bold text-white transition-all hover:bg-white/10"
+                >
+                  <span className="relative z-10">WhatsApp Enquiry</span>
+                </a>
+              </motion.div>
+            </div>
+            
+            {/* Decorative 3D elements (abstract) */}
+            <motion.div 
+              animate={{ 
+                y: [0, -30, 0],
+                rotate: [0, 5, 0]
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -bottom-20 -right-20 w-80 h-80 bg-gradient-to-br from-[#D7B06B]/20 to-transparent rounded-full blur-3xl pointer-events-none" 
+            />
+            <motion.div 
+              animate={{ 
+                y: [0, 40, 0],
+                rotate: [0, -10, 0]
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-tr from-[#8C6A3A]/20 to-transparent rounded-full blur-3xl pointer-events-none" 
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <footer className="relative z-10 bg-[#0E0E0E] pt-24 pb-12 text-white overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-16 lg:grid-cols-2">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="grid gap-16 lg:grid-cols-2"
+          >
             <div>
               <h4 className="text-4xl font-normal" style={{ fontFamily: "Instrument Serif, serif" }}>
                 Kushi Agro Foods
@@ -1484,7 +1690,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
           
           <div className="mt-24 border-t border-white/5 pt-12 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-xs text-white/30 uppercase tracking-[0.2em]">
