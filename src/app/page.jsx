@@ -261,11 +261,27 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
       className="relative z-10 w-full"
     >
       {/* Brand Header */}
-      <div className="flex items-baseline gap-6 mb-12 px-4">
-        <h4 className="text-4xl md:text-5xl text-[#1D160E] whitespace-nowrap" style={{ fontFamily: "Instrument Serif, serif" }}>
-          {brand}
-        </h4>
-        <div className="h-px flex-1 bg-[#E3D2B5] opacity-20" />
+      <div className="flex flex-col items-center justify-center mb-16 px-4 relative">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-10 text-center"
+        >
+          <h4 
+            className="text-5xl md:text-7xl whitespace-nowrap tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#8C6A3A] via-[#D7B06B] to-[#8C6A3A] drop-shadow-sm pb-1" 
+            style={{ fontFamily: "Instrument Serif, serif" }}
+          >
+            {brand}
+          </h4>
+          {/* Elegant decorative divider */}
+          <div className="mx-auto mt-4 flex items-center justify-center gap-3">
+            <div className="h-[1px] w-12 md:w-20 bg-gradient-to-r from-transparent to-[#D7B06B]" />
+            <div className="h-1.5 w-1.5 md:h-2 md:w-2 rotate-45 bg-[#1D160E]" />
+            <div className="h-[1px] w-12 md:w-20 bg-gradient-to-l from-transparent to-[#D7B06B]" />
+          </div>
+        </motion.div>
       </div>
 
       {/* 3D Slider */}
