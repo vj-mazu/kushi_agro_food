@@ -205,33 +205,64 @@ function createWhatsAppUrl(items) {
 function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActiveImageIndex, addToCart, createWhatsAppUrl, PHONE_RAW }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef(null);
-  const autoPlayRef = useRef(null);
-
   const totalProducts = visibleProducts.length;
+  const timerRef = useRef(null);
+  const lastInteractionRef = useRef(0);
 
-  // Auto-play
+  const COOLDOWN = 800; // ms between clicks to prevent double-jumps
+
+  // Sync activeIndex with totalProducts to prevent out-of-bounds
   useEffect(() => {
+    if (totalProducts > 0 && activeIndex >= totalProducts) {
+      setActiveIndex(0);
+    }
+  }, [totalProducts, activeIndex]);
+
+  const stopAutoPlay = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const startAutoPlay = useCallback(() => {
+    stopAutoPlay();
     if (totalProducts <= 1) return;
-    autoPlayRef.current = setInterval(() => {
+    
+    timerRef.current = setTimeout(() => {
       setActiveIndex((prev) => (prev + 1) % totalProducts);
     }, 5000);
-    return () => clearInterval(autoPlayRef.current);
+  }, [totalProducts, stopAutoPlay]);
+
+  // Restart autoplay whenever activeIndex changes (either by timer or by user)
+  useEffect(() => {
+    startAutoPlay();
+    return () => stopAutoPlay();
+  }, [activeIndex, startAutoPlay, stopAutoPlay]);
+
+  const goTo = useCallback((index) => {
+    const now = Date.now();
+    if (now - lastInteractionRef.current < COOLDOWN) return;
+    lastInteractionRef.current = now;
+    
+    setActiveIndex(index);
+  }, []);
+
+  const goNext = useCallback(() => {
+    const now = Date.now();
+    if (now - lastInteractionRef.current < COOLDOWN) return;
+    lastInteractionRef.current = now;
+
+    setActiveIndex((prev) => (prev + 1) % totalProducts);
   }, [totalProducts]);
 
-  const resetAutoPlay = () => {
-    clearInterval(autoPlayRef.current);
-    autoPlayRef.current = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % totalProducts);
-    }, 5000);
-  };
+  const goPrev = useCallback(() => {
+    const now = Date.now();
+    if (now - lastInteractionRef.current < COOLDOWN) return;
+    lastInteractionRef.current = now;
 
-  const goTo = (index) => {
-    setActiveIndex(index);
-    resetAutoPlay();
-  };
-
-  const goNext = () => goTo((activeIndex + 1) % totalProducts);
-  const goPrev = () => goTo((activeIndex - 1 + totalProducts) % totalProducts);
+    setActiveIndex((prev) => (prev - 1 + totalProducts) % totalProducts);
+  }, [totalProducts]);
 
   // Calculate 3D position for each card
   const getCardStyle = (index) => {
@@ -395,7 +426,6 @@ export default function Home() {
   const [videoOpacity, setVideoOpacity] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [productScrollIndex, setProductScrollIndex] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -505,13 +535,7 @@ export default function Home() {
     };
   }, []);
 
-  const scrollToProduct = (index) => {
-    const container = productCarouselRef.current;
-    const target = container?.children?.[index];
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    setProductScrollIndex(index);
-  };
+
 
   const scrollToProductImage = (index) => {
     const container = detailCarouselRef.current;

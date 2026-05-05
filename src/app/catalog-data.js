@@ -113,8 +113,8 @@ export const defaultCatalog = [
   },
   {
     id: "11",
-    name: "VM Jeera Rice",
-    brand: "VM",
+    name: "VM Bullet Rice",
+    brand: "VM Bullet",
     variant: "Pink Pack",
     tagline: "Jeera rice marriage special biryani colom rice",
     description: "A **versatile performer**, the Pink Pack is ideal for both **daily meals and festive biryanis**. It offers a **premium mouthfeel** and **delicate fragrance** at an affordable price.",
