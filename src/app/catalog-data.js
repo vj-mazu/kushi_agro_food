@@ -255,7 +255,7 @@ export function buildCatalogProducts(catalog) {
         (_, index) =>
           `/images/catalog/product-${product.id}/view-${String(index + 1).padStart(2, "0")}.jpeg`
       );
-      if (product.coverImage) {
+      if (product.coverImage && !images.includes(product.coverImage)) {
         images = [product.coverImage, ...images];
       }
     }

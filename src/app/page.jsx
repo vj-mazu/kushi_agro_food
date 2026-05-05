@@ -500,8 +500,14 @@ export default function Home() {
   const scrollToProductImage = (index) => {
     const container = detailCarouselRef.current;
     const target = container?.children?.[index];
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (!target || !container) return;
+    
+    // Use scrollTo instead of scrollIntoView to prevent the entire modal/page from scrolling
+    container.scrollTo({
+      left: target.offsetLeft - container.offsetLeft,
+      behavior: "smooth"
+    });
+    
     setActiveImageIndex(index);
   };
 
