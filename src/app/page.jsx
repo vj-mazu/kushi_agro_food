@@ -269,7 +269,7 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
       </div>
 
       {/* 3D Slider */}
-      <div className="slider-3d-container relative h-[600px] w-full flex items-center justify-center overflow-visible">
+      <div className="slider-3d-container relative h-[480px] md:h-[600px] w-full flex items-center justify-center overflow-visible">
         <div className="slider-3d-track relative flex items-center justify-center w-full h-full" style={{ perspective: "1500px" }}>
           {visibleProducts.map((product, index) => {
             const style = getCardStyle(index);
@@ -299,11 +299,11 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
                 }}
                 onClick={() => style.isActive && setSelectedProduct(product)}
               >
-                <div className="relative h-[480px] w-full rounded-[3.5rem] bg-white p-10 shadow-[0_40px_100px_rgba(29,22,14,0.1)] overflow-hidden border border-[#E3D2B5]/50 transition-all duration-700 hover:shadow-[0_50px_120px_rgba(29,22,14,0.15)]">
+                <div className="relative h-[400px] md:h-[480px] w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-white p-6 md:p-10 shadow-[0_40px_100px_rgba(29,22,14,0.1)] overflow-hidden border border-[#E3D2B5]/50 transition-all duration-700 hover:shadow-[0_50px_120px_rgba(29,22,14,0.15)] flex flex-col justify-between">
                   {/* Subtle glass sheen */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none" />
                   
-                  <div className="relative h-60 w-full flex items-center justify-center mb-6">
+                  <div className="relative h-44 md:h-60 w-full flex items-center justify-center mb-4 md:mb-6 mt-2">
                     <motion.img
                       src={product.coverImage}
                       alt={product.name}
@@ -320,29 +320,18 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
                   </div>
 
                   <div className="text-center relative z-10">
-                    <p className="text-[9px] uppercase tracking-[0.5em] text-[#D7B06B] font-bold mb-3">
+                    <p className="text-[9px] uppercase tracking-[0.5em] text-[#D7B06B] font-bold mb-2 md:mb-3">
                       {product.brand}
                     </p>
                     <h4 className="text-2xl md:text-3xl font-normal text-[#1D160E] leading-tight mb-2" style={{ fontFamily: "Instrument Serif, serif" }}>
                       {product.name}
                     </h4>
                     {product.variant && (
-                      <p className="text-sm italic text-[#8C6A3A]/70 mb-6">{product.variant}</p>
+                      <p className="text-xs md:text-sm italic text-[#8C6A3A]/70 mb-4 md:mb-6">{product.variant}</p>
                     )}
-                    <p className="text-xs font-bold text-[#8C6A3A] mb-8 bg-[#FBF8F2] py-2 px-4 rounded-full inline-block">
+                    <p className="text-[10px] md:text-xs font-bold text-[#8C6A3A] mb-2 bg-[#FBF8F2] py-2 px-4 rounded-full inline-block">
                       {product.pack} Pack
                     </p>
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(product);
-                      }}
-                      className="group relative w-full py-4 rounded-full bg-[#1D160E] text-white text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-[#8C6A3A] overflow-hidden shadow-lg"
-                    >
-                      <span className="relative z-10">Add to Enquiry</span>
-                      <div className="absolute inset-0 -translate-x-full bg-[#8C6A3A] transition-transform duration-500 group-hover:translate-x-0" />
-                    </button>
                   </div>
                 </div>
               </motion.article>
