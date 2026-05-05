@@ -1272,36 +1272,36 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 px-4 py-6 backdrop-blur-md flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-black/80 p-4 md:px-4 md:py-6 backdrop-blur-md flex items-center justify-center"
             onClick={() => setSelectedProduct(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-[3rem] bg-[#FFFDF9] shadow-2xl flex flex-col"
+              className="w-full max-w-5xl max-h-[95vh] md:max-h-[90vh] overflow-hidden rounded-[2rem] md:rounded-[3rem] bg-[#FFFDF9] shadow-2xl flex flex-col"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-center justify-between border-b border-[#E5D7BD] px-10 py-6">
+              <div className="flex items-center justify-between border-b border-[#E5D7BD] px-6 py-4 md:px-10 md:py-6">
                 <div>
-                  <h4 className="text-4xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
+                  <h4 className="text-3xl md:text-4xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
                     {selectedProduct.name}
                   </h4>
-                  <p className="mt-2 text-sm font-medium text-[#8C6A3A]">
+                  <p className="mt-1 md:mt-2 text-xs md:text-sm font-medium text-[#8C6A3A]">
                     Pack Size: {selectedProduct.pack}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedProduct(null)}
-                  className="rounded-full border border-[#D9C8A7] px-6 py-2.5 text-sm text-[#1D160E] transition hover:bg-[#F3E7CF]"
+                  className="rounded-full border border-[#D9C8A7] px-4 py-2 md:px-6 md:py-2.5 text-xs md:text-sm text-[#1D160E] transition hover:bg-[#F3E7CF]"
                 >
                   Close
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-10 py-10">
-                <div className="flex flex-col lg:flex-row gap-12">
+              <div className="flex-1 overflow-y-auto px-6 py-6 md:px-10 md:py-10">
+                <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
                   <div className="w-full lg:w-1/2">
                     <div className="relative">
                       <div 
@@ -1317,7 +1317,7 @@ export default function Home() {
                         {selectedProduct.images.map((image, index) => (
                           <div
                             key={index}
-                            className="min-w-full snap-center rounded-3xl overflow-hidden bg-white border border-[#E5D7BD] p-8 aspect-square flex items-center justify-center"
+                            className="min-w-full snap-center rounded-[2rem] md:rounded-3xl overflow-hidden bg-white border border-[#E5D7BD] p-4 md:p-8 aspect-square flex items-center justify-center"
                           >
                             <img
                               src={image}
@@ -1361,8 +1361,8 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <div className="w-full lg:w-1/2 space-y-8">
-                    <div className="space-y-6">
+                  <div className="w-full lg:w-1/2 space-y-6 md:space-y-8">
+                    <div className="space-y-4 md:space-y-6">
                       <div className="flex items-center gap-3">
                         <div className="h-2 w-2 rounded-full bg-[#D7B06B] animate-pulse" />
                         <span className="text-xs font-bold uppercase tracking-widest text-[#8C6A3A]">Premium Factory Supply</span>
@@ -1374,12 +1374,12 @@ export default function Home() {
                           ))}
                         </div>
                       </div>
-                      <h5 className="text-3xl font-bold text-[#1D160E] leading-tight">Premium Quality Selection</h5>
+                      <h5 className="text-2xl md:text-3xl font-bold text-[#1D160E] leading-tight">Premium Quality Selection</h5>
                       <div className="mt-4 flex items-baseline gap-3">
                         <span className="text-4xl font-serif text-[#1D160E]">Price on Inquiry</span>
                         <span className="text-[10px] text-[#8C6A3A] uppercase tracking-[0.2em] font-bold">(Wholesale & Retail)</span>
                       </div>
-                      <p className="text-[#5F5548] leading-relaxed text-lg border-l-2 border-[#E3D2B5] pl-6 italic">
+                      <p className="text-[#5F5548] leading-relaxed text-base md:text-lg border-l-2 border-[#E3D2B5] pl-4 md:pl-6 italic">
                         {selectedProduct.description ? (
                           selectedProduct.description.split(/(\*\*.*?\*\*)/g).map((part, i) => 
                             part.startsWith('**') && part.endsWith('**') ? (
@@ -1396,11 +1396,11 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="sticky bottom-0 bg-[#FFFDF9] pt-6 pb-2 border-t border-[#E5D7BD]/50 flex flex-col gap-4 mt-auto">
+                    <div className="sticky bottom-0 bg-[#FFFDF9] pt-4 pb-2 md:pt-6 md:pb-2 border-t border-[#E5D7BD]/50 flex flex-col gap-3 md:gap-4 mt-auto">
                       <button
                         type="button"
                         onClick={() => addToCart(selectedProduct)}
-                        className="w-full rounded-full bg-[#1D160E] px-8 py-5 text-sm font-bold text-white transition hover:bg-[#3A2E21] hover:shadow-xl"
+                        className="w-full rounded-full bg-[#1D160E] px-6 py-4 md:px-8 md:py-5 text-[13px] md:text-sm font-bold text-white transition hover:bg-[#3A2E21] hover:shadow-xl"
                       >
                         Add To Enquiry Cart
                       </button>
@@ -1410,14 +1410,14 @@ export default function Home() {
                           target="_blank"
                           rel="noreferrer"
                           onClick={() => addToCart(selectedProduct)}
-                          className="flex items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-6 py-4 text-center text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
+                          className="flex items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-3 py-3 md:px-6 md:py-4 text-center text-[12px] md:text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
                         >
                           WhatsApp Order
                         </a>
                         <a
                           href={`tel:${PHONE_RAW}`}
                           onClick={() => addToCart(selectedProduct)}
-                          className="flex items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-6 py-4 text-center text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
+                          className="flex items-center justify-center rounded-full border border-[#D9C8A7] bg-white px-3 py-3 md:px-6 md:py-4 text-center text-[12px] md:text-sm font-bold text-[#1D160E] transition hover:bg-[#F3E7CF] hover:border-[#8C6A3A]"
                         >
                           Call Order
                         </a>
