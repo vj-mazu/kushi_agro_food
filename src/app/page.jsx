@@ -1295,7 +1295,7 @@ export default function Home() {
                     <div className="relative">
                       <div 
                         ref={detailCarouselRef}
-                        className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar"
+                        className="flex items-center gap-6 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar"
                         onScroll={(e) => {
                           const scrollLeft = e.currentTarget.scrollLeft;
                           const width = e.currentTarget.clientWidth;
@@ -1306,13 +1306,13 @@ export default function Home() {
                         {selectedProduct.images.map((image, index) => (
                           <div
                             key={index}
-                            className="min-w-full snap-center rounded-[2rem] md:rounded-3xl overflow-hidden bg-white border border-[#E5D7BD] p-4 md:p-8 aspect-square flex items-center justify-center"
+                            className="w-full shrink-0 snap-center rounded-[2rem] md:rounded-3xl overflow-hidden bg-white border border-[#E5D7BD] relative h-[320px] md:h-[450px]"
                           >
                             <img
                               src={image}
                               alt={`${selectedProduct.name} view ${index + 1}`}
                               loading="lazy"
-                              className="max-h-full max-w-full object-contain"
+                              className="absolute inset-4 md:inset-8 w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] h-[calc(100%-2rem)] md:h-[calc(100%-4rem)] object-contain m-auto"
                             />
                           </div>
                         ))}
@@ -1385,7 +1385,7 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="sticky bottom-0 bg-[#FFFDF9] pt-4 pb-2 md:pt-6 md:pb-2 border-t border-[#E5D7BD]/50 flex flex-col gap-3 md:gap-4 mt-auto">
+                    <div className="pt-4 md:pt-6 flex flex-col gap-3 md:gap-4 mt-8">
                       <button
                         type="button"
                         onClick={() => addToCart(selectedProduct)}
@@ -1419,13 +1419,6 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-      <button
-        type="button"
-        onClick={() => setIsCartOpen(true)}
-        className="fixed bottom-5 right-5 z-40 rounded-full bg-[#1D160E] px-5 py-4 text-sm text-white shadow-[0_18px_40px_rgba(29,22,14,0.35)] transition hover:bg-[#3A2E21]"
-      >
-        Cart {cartCount > 0 ? `(${cartCount})` : ""}
-      </button>
 
       {isCartOpen && (
         <div
