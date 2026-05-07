@@ -1250,20 +1250,46 @@ export default function Home() {
       </section>
 
       <section id="testimonials" className="relative z-10 bg-white px-6 py-20 lg:py-40 lg:px-8 overflow-hidden">
+        {/* Graphify Style: Vertical Branding Watermark */}
+        <motion.div
+          initial={{ opacity: 0, x: -100 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 2, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute -left-16 top-1/2 -translate-y-1/2 hidden xl:block pointer-events-none select-none"
+          style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateY(50%)' }}
+        >
+          <span className="text-[10rem] font-serif font-black text-[#F4E6C8]/25 tracking-tighter whitespace-nowrap uppercase">
+            Trusted Excellence
+          </span>
+        </motion.div>
+
         <div className="mx-auto max-w-7xl">
           <motion.div 
-            initial={{ opacity: 0, y: 40, clipPath: "inset(100% 0 0 0)" }}
-            whileInView={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-20px" }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="text-center mb-24"
           >
-            <p className="text-sm uppercase tracking-[0.5em] text-[#8C6A3A] font-bold">
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="h-px w-24 bg-[#D7B06B] mx-auto mb-8"
+            />
+            <p className="text-sm uppercase tracking-[0.6em] text-[#8C6A3A] font-bold">
               Customer Voices
             </p>
-            <h3 className="mt-8 text-6xl md:text-8xl text-[#1D160E]" style={{ fontFamily: "Instrument Serif, serif" }}>
+            <h3 className="mt-8 text-5xl md:text-8xl text-[#1D160E] leading-[1.1]" style={{ fontFamily: "Instrument Serif, serif" }}>
               Trusted Excellence
             </h3>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <div className="h-[1px] w-8 bg-[#D7B06B]/30" />
+              <div className="h-1.5 w-1.5 rotate-45 bg-[#D7B06B]" />
+              <div className="h-[1px] w-8 bg-[#D7B06B]/30" />
+            </div>
           </motion.div>
           <div className="grid gap-12 md:grid-cols-3">
             {testimonials.map((t, idx) => (
@@ -1279,20 +1305,45 @@ export default function Home() {
                   y: -10,
                   transition: { duration: 0.4 }
                 }}
-                className="rounded-[4rem] border border-[#E3D2B5] bg-[#FBF8F2] p-12 shadow-[0_20px_60px_rgba(140,106,58,0.04)] hover:shadow-[0_40px_80px_rgba(140,106,58,0.12)] transition-all duration-500 cursor-default"
+                className="relative group rounded-[3rem] border border-[#E3D2B5]/50 bg-white p-8 md:p-12 shadow-[0_15px_45px_rgba(140,106,58,0.05)] hover:shadow-[0_40px_90px_rgba(140,106,58,0.15)] transition-all duration-700 cursor-default overflow-hidden"
                 style={{ perspective: "1500px" }}
               >
-                <div className="flex text-[#D7B06B] mb-8">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-6 h-6 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity duration-700">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat" />
                 </div>
-                <p className="text-2xl leading-relaxed text-[#1D160E] font-serif italic">"{t.text}"</p>
-                <div className="mt-10 border-t border-[#E3D2B5] pt-8">
-                  <p className="text-xl font-bold text-[#1D160E]">{t.name}</p>
-                  <p className="text-xs uppercase tracking-widest text-[#8C6A3A] mt-2">{t.role}</p>
+                
+                {/* Glass Sheen */}
+                <div className="absolute -inset-[100%] bg-gradient-to-tr from-transparent via-white/40 to-transparent rotate-45 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none" />
+
+                <div className="relative z-10">
+                  <div className="flex text-[#D7B06B] mb-8 gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.svg 
+                        key={i} 
+                        initial={{ opacity: 0, scale: 0 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: (idx * 0.2) + (i * 0.1) }}
+                        className="w-5 h-5 fill-current" 
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </motion.svg>
+                    ))}
+                  </div>
+                  <p className="text-xl md:text-2xl leading-relaxed text-[#1D160E] font-serif italic mb-10">
+                    &ldquo;{t.text}&rdquo;
+                  </p>
+                  <div className="border-t border-[#E3D2B5]/40 pt-8 flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-[#F4E6C8] to-[#D7B06B]/20 flex items-center justify-center text-[#8C6A3A] font-bold text-lg font-serif">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-[#1D160E] tracking-tight">{t.name}</p>
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-[#8C6A3A] font-bold mt-1 opacity-70">{t.role}</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}
