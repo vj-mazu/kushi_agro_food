@@ -316,7 +316,7 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
       </div>
 
       {/* 3D Slider */}
-      <div className="slider-3d-container relative h-[480px] md:h-[600px] w-full flex items-center justify-center overflow-visible">
+      <div className={`slider-3d-container relative ${totalProducts > 1 ? 'h-[480px] md:h-[600px]' : 'h-[420px] md:h-[520px]'} w-full flex items-center justify-center overflow-visible transition-all duration-500`}>
         <div className="slider-3d-track relative flex items-center justify-center w-full h-full" style={{ perspective: "1500px" }}>
           {visibleProducts.map((product, index) => {
             const style = getCardStyle(index);
@@ -387,37 +387,39 @@ function BrandCarousel3D({ brand, visibleProducts, setSelectedProduct, setActive
         </div>
       </div>
 
-      {/* Slider Progress & Navigation */}
-      <div className="mx-auto max-w-xs mt-10 space-y-8">
-        <div className="slider-progress w-full">
-          <div 
-            className="slider-progress-fill" 
-            style={{ width: `${((activeIndex + 1) / totalProducts) * 100}%` }}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between gap-6 px-4">
-          <button onClick={goPrev} className="slider-nav-btn text-[#1D160E] hover:text-white">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-          </button>
-          
-          <div className="flex items-center gap-3">
-            {visibleProducts.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  activeIndex === i ? "w-8 bg-[#1D160E]" : "w-1.5 bg-[#D9C8A7]"
-                }`}
-              />
-            ))}
+      {/* Slider Progress & Navigation - Only show if more than 1 product */}
+      {totalProducts > 1 && (
+        <div className="mx-auto max-w-xs mt-10 space-y-8">
+          <div className="slider-progress w-full">
+            <div 
+              className="slider-progress-fill" 
+              style={{ width: `${((activeIndex + 1) / totalProducts) * 100}%` }}
+            />
           </div>
+          
+          <div className="flex items-center justify-between gap-6 px-4">
+            <button onClick={goPrev} className="slider-nav-btn text-[#1D160E] hover:text-white">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            
+            <div className="flex items-center gap-3">
+              {visibleProducts.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
+                    activeIndex === i ? "w-8 bg-[#1D160E]" : "w-1.5 bg-[#D9C8A7]"
+                  }`}
+                />
+              ))}
+            </div>
 
-          <button onClick={goNext} className="slider-nav-btn text-[#1D160E] hover:text-white">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-          </button>
+            <button onClick={goNext} className="slider-nav-btn text-[#1D160E] hover:text-white">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 }
